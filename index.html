@@ -1,0 +1,2845 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#FDFAF6" />
+  <title>Studio Furinhos – Piercing & Joias</title>
+  <meta name="description" content="Studio Furinhos – Piercing profissional com biossegurança e joias exclusivas em Tatuí/SP. Agende seu horário online." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────────── */
+    :root {
+      color-scheme: light;
+      --bg:        #FDFAF6;
+      --bg2:       #FFFFFF;
+      --bg3:       #F5F0EA;
+      --border:    #E8DDD0;
+      --gold:      #B8945A;
+      --gold-lt:   #D4AA72;
+      --gold-dk:   #9A7540;
+      --text:      #0D0A07;
+      --muted:     #4A3F32;
+      --radius:    12px;
+      --radius-lg: 20px;
+      --whatsapp:  #25D366;
+      --font-head: 'Cormorant Garamond', serif;
+      --font-body: 'Nunito', sans-serif;
+      --transition: .3s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ─── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background: #FDFAF6; }
+    body {
+      background: #FDFAF6;
+      color: #0D0A07;
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+    input, select, textarea {
+      font-family: var(--font-body);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      width: 100%;
+      font-size: .95rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,169,110,.12);
+    }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    select option { background: var(--bg3); }
+
+    /* ─── Page System ────────────────────────────────────────── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ─── Gold Line ─────────────────────────────────────────── */
+    .gold-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto;
+    }
+
+    /* ─── Nav ───────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 40px;
+      background: rgba(253,250,246,.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(184,148,90,.2);
+      transition: padding var(--transition);
+    }
+    .nav-logo {
+      display: flex; align-items: center; line-height: 1;
+    }
+    .nav-logo .logo-main {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: var(--gold);
+    }
+    .nav-logo .logo-sub {
+      font-size: .65rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .nav-links {
+      display: flex; gap: 36px; list-style: none;
+      align-items: center;
+    }
+    .nav-links li a {
+      font-size: .8rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color var(--transition);
+      position: relative;
+    }
+    .nav-links li a::after {
+      content:''; position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+      transform: scaleX(0); transform-origin: center;
+      transition: transform var(--transition);
+    }
+    .nav-links li a:hover, .nav-links li a.active { color: var(--gold); }
+    .nav-links li a:hover::after, .nav-links li a.active::after { transform: scaleX(1); }
+    .nav-cta {
+      background: var(--gold);
+      color: #0d0d0d;
+      font-size: .75rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      border-radius: 100px;
+      font-weight: 600;
+      transition: background var(--transition), transform var(--transition);
+    }
+    .nav-cta:hover { background: var(--gold-lt); transform: translateY(-1px); }
+
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      padding: 4px; background: none; border: none;
+    }
+    .hamburger span {
+      display: block; width: 24px; height: 1.5px;
+      background: var(--gold); border-radius: 2px;
+      transition: all var(--transition);
+    }
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(253,250,246,.98); backdrop-filter: blur(20px);
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 32px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: var(--font-head); font-size: 2.2rem; font-weight: 300;
+      color: var(--text); transition: color var(--transition);
+    }
+    .mobile-menu a:hover { color: var(--gold); }
+    .mobile-menu .close-btn {
+      position: absolute; top: 24px; right: 28px;
+      font-size: 2rem; color: var(--muted); background: none; border: none;
+    }
+
+    /* ─── Buttons ────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 15px 32px;
+      font-family: var(--font-body); font-size: .8rem;
+      letter-spacing: .18em; text-transform: uppercase; font-weight: 500;
+      border-radius: 100px; border: none;
+      transition: all var(--transition); cursor: pointer;
+    }
+    .btn-gold {
+      background: var(--gold); color: #0d0d0d;
+    }
+    .btn-gold:hover { background: var(--gold-lt); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200,169,110,.25); }
+    .btn-outline {
+      background: transparent; color: var(--gold);
+      border: 1px solid var(--gold-dk);
+    }
+    .btn-outline:hover { border-color: var(--gold); background: rgba(200,169,110,.06); transform: translateY(-2px); }
+    .btn-whatsapp {
+      background: var(--whatsapp); color: #fff;
+    }
+    .btn-whatsapp:hover { background: #1ebe5d; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,211,102,.25); }
+
+    /* ─── Floating WhatsApp ──────────────────────────────────── */
+    .whatsapp-float {
+      position: fixed; bottom: 28px; right: 28px; z-index: 900;
+      width: 58px; height: 58px; border-radius: 50%;
+      background: var(--whatsapp);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 24px rgba(37,211,102,.4);
+      transition: all var(--transition);
+      animation: waPulse 2.5s ease infinite;
+    }
+    .whatsapp-float:hover { transform: scale(1.08); box-shadow: 0 6px 32px rgba(37,211,102,.55); animation: none; }
+    .whatsapp-float svg { width: 28px; height: 28px; fill: #fff; }
+    @keyframes waPulse {
+      0%,100% { box-shadow: 0 4px 24px rgba(37,211,102,.4); }
+      50%      { box-shadow: 0 4px 40px rgba(37,211,102,.7); }
+    }
+
+    /* ─── Section Wrapper ────────────────────────────────────── */
+    .section { padding: 100px 40px; }
+    .container { max-width: 1160px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block;
+      font-size: .7rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--gold); border: 1px solid var(--gold-dk);
+      padding: 5px 16px; border-radius: 100px; margin-bottom: 20px;
+    }
+    .section-title {
+      font-family: var(--font-head); font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300; line-height: 1.15;
+      color: var(--text);
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    /* ─── HOME PAGE ──────────────────────────────────────────── */
+    /* Hero */
+    .hero {
+      padding: 130px 0 80px;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 70% at 80% 50%, rgba(184,148,90,.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 10% 80%, rgba(184,148,90,.05) 0%, transparent 60%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; opacity: .035;
+      background-image: linear-gradient(rgba(184,148,90,.15) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(184,148,90,.15) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: center; max-width: 1160px; margin: 0 auto;
+      padding: 0 40px;
+    }
+    .hero-content {}
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(200,169,110,.08); border: 1px solid rgba(200,169,110,.2);
+      padding: 7px 18px; border-radius: 100px;
+      font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 32px;
+    }
+    .hero-badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gold); animation: blink 1.5s ease infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .hero-title {
+      font-family: var(--font-head);
+      font-size: clamp(3rem, 6vw, 5.2rem);
+      font-weight: 300; line-height: 1.05;
+      margin-bottom: 24px;
+    }
+    .hero-title strong { color: var(--gold); font-weight: 600; }
+    .hero-desc {
+      font-size: 1rem; color: var(--muted); max-width: 440px;
+      line-height: 1.75; margin-bottom: 44px;
+    }
+    .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+    .hero-stats {
+      display: flex; gap: 40px; margin-top: 32px;
+      padding-top: 28px; border-top: 1px solid var(--border);
+    }
+    .stat-num {
+      font-family: var(--font-head); font-size: 2.2rem;
+      font-weight: 600; color: var(--gold); line-height: 1;
+    }
+    .stat-label {
+      font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--muted); margin-top: 4px;
+    }
+
+    /* Hero visual card */
+    .hero-visual {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-card {
+      position: relative; width: 100%; max-width: 380px;
+    }
+    .hero-card-inner {
+      background: var(--bg2);
+      border: 1px solid rgba(200,169,110,.2);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      box-shadow: 0 20px 80px rgba(0,0,0,.08), 0 0 0 1px rgba(184,148,90,.1);
+      position: relative; overflow: hidden;
+    }
+    .hero-card-inner::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .card-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(200,169,110,.1); border: 1px solid rgba(200,169,110,.2);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px; font-size: 1.8rem;
+    }
+    .card-title-sm {
+      font-family: var(--font-head); font-size: 1.5rem; font-weight: 300;
+      margin-bottom: 8px;
+    }
+    .card-desc-sm { font-size: .85rem; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    .hero-features { display: flex; flex-direction: column; gap: 14px; }
+    .feature-row {
+      display: flex; align-items: center; gap: 12px;
+      font-size: .85rem; color: var(--muted);
+    }
+    .feature-row .check {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(200,169,110,.12); border: 1px solid rgba(200,169,110,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .6rem; color: var(--gold); flex-shrink: 0;
+    }
+    .hero-orb {
+      position: absolute; width: 180px; height: 180px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,169,110,.15), transparent 70%);
+      top: -60px; right: -60px; pointer-events: none;
+    }
+
+    /* Highlights */
+    .highlights { background: var(--bg3); }
+    .highlights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .highlight-item {
+      background: var(--bg2); padding: 60px 48px;
+      border: 1px solid var(--border);
+      transition: background var(--transition), border-color var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .highlight-item:first-child { border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
+    .highlight-item:last-child  { border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+    .highlight-item:hover { background: #191919; border-color: rgba(200,169,110,.25); }
+    .highlight-item::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transform: scaleX(0); transition: transform var(--transition);
+    }
+    .highlight-item:hover::after { transform: scaleX(1); }
+    .h-icon { font-size: 2.4rem; margin-bottom: 20px; display: block; }
+    .h-title {
+      font-family: var(--font-head); font-size: 1.4rem; font-weight: 400;
+      margin-bottom: 12px;
+    }
+    .h-text { font-size: .88rem; color: var(--muted); line-height: 1.7; }
+
+    /* Testimonial */
+    .testimonials {}
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 36px 32px;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .testimonial-card:hover { border-color: rgba(200,169,110,.2); transform: translateY(-4px); }
+    .stars { color: var(--gold); font-size: .85rem; letter-spacing: 2px; margin-bottom: 20px; }
+    .t-text { font-size: .9rem; color: var(--muted); line-height: 1.75; margin-bottom: 24px; font-style: italic; }
+    .t-author { display: flex; align-items: center; gap: 12px; }
+    .t-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--gold-dk); display: flex; align-items: center;
+      justify-content: center; font-size: 1rem; color: #0d0d0d; font-weight: 600;
+    }
+    .t-name { font-size: .85rem; font-weight: 500; }
+    .t-tag { font-size: .75rem; color: var(--muted); }
+
+    /* CTA Banner */
+    .cta-banner {
+      background: var(--bg2);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .cta-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 40px; flex-wrap: wrap;
+      max-width: 1160px; margin: 0 auto; padding: 70px 40px;
+    }
+    .cta-text .label { font-size: .7rem; letter-spacing: .25em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .cta-text .title { font-family: var(--font-head); font-size: 2.2rem; font-weight: 300; }
+    .cta-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    /* ─── SERVICES PAGE ──────────────────────────────────────── */
+    .services-hero {
+      padding: 160px 40px 80px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .services-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(200,169,110,.08), transparent 70%);
+    }
+    .services-hero-content { position: relative; z-index: 1; }
+    .services-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px; margin-top: 60px;
+    }
+    .service-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 36px 32px;
+      transition: all var(--transition); cursor: default;
+      position: relative; overflow: hidden;
+    }
+    .service-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0; transition: opacity var(--transition);
+    }
+    .service-card:hover { border-color: rgba(200,169,110,.25); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+    .service-card:hover::before { opacity: 1; }
+    .service-emoji { font-size: 2rem; margin-bottom: 18px; }
+    .service-name { font-family: var(--font-head); font-size: 1.3rem; margin-bottom: 8px; }
+    .service-desc { font-size: .85rem; color: var(--muted); line-height: 1.65; margin-bottom: 24px; }
+    .service-footer { display: flex; align-items: center; justify-content: space-between; }
+    .service-price { font-family: var(--font-head); font-size: 1.4rem; color: var(--gold); }
+    .service-duration {
+      font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--muted); background: var(--bg3); padding: 5px 12px;
+      border-radius: 100px; border: 1px solid var(--border);
+    }
+    .service-book-btn {
+      width: 100%; margin-top: 20px; padding: 12px;
+      background: rgba(200,169,110,.08); border: 1px solid var(--gold-dk);
+      color: var(--gold); border-radius: var(--radius);
+      font-size: .78rem; letter-spacing: .15em; text-transform: uppercase;
+      font-family: var(--font-body); font-weight: 500;
+      transition: all var(--transition); cursor: pointer;
+    }
+    .service-book-btn:hover { background: var(--gold); color: #0d0d0d; }
+
+    /* ─── BOOKING PAGE ───────────────────────────────────────── */
+    .booking-page { padding: 140px 40px 80px; }
+    .booking-layout { display: grid; grid-template-columns: 1fr 380px; gap: 48px; max-width: 1000px; margin: 0 auto; }
+
+    /* Steps indicator */
+    .steps-indicator { display: flex; align-items: center; gap: 0; margin-bottom: 48px; }
+    .step-item { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+    .step-item:not(:last-child)::after {
+      content: ''; position: absolute; left: 50%; right: -50%;
+      top: 17px; height: 1px;
+      background: var(--border);
+      z-index: 0;
+    }
+    .step-item.done:not(:last-child)::after,
+    .step-item.active:not(:last-child)::after { background: var(--gold); }
+    .step-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--bg2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; color: var(--muted); position: relative; z-index: 1;
+      transition: all var(--transition); font-weight: 500;
+    }
+    .step-item.active .step-circle { border-color: var(--gold); background: var(--gold); color: #0d0d0d; font-weight: 600; }
+    .step-item.done .step-circle   { border-color: var(--gold); background: rgba(200,169,110,.15); color: var(--gold); }
+    .step-label { font-size: .7rem; letter-spacing: .1em; color: var(--muted); margin-top: 8px; text-transform: uppercase; text-align: center; }
+    .step-item.active .step-label { color: var(--gold); }
+
+    /* Form card */
+    .form-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 48px 44px;
+      position: relative; overflow: hidden;
+    }
+    .form-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .form-step { display: none; }
+    .form-step.active { display: block; animation: fadeIn .4s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .form-step-title { font-family: var(--font-head); font-size: 1.8rem; font-weight: 300; margin-bottom: 6px; }
+    .form-step-sub { font-size: .85rem; color: var(--muted); margin-bottom: 36px; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* Service option cards */
+    .service-options { display: grid; gap: 12px; }
+    .service-option {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px 20px; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--radius); cursor: pointer; transition: all var(--transition);
+    }
+    .service-option:hover { border-color: rgba(200,169,110,.3); }
+    .service-option.selected { border-color: var(--gold); background: rgba(200,169,110,.06); }
+    .service-option input[type="radio"] { display: none; }
+    .so-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .so-info { flex: 1; }
+    .so-name { font-size: .92rem; font-weight: 500; margin-bottom: 2px; }
+    .so-duration { font-size: .75rem; color: var(--muted); }
+    .so-price { font-family: var(--font-head); font-size: 1.1rem; color: var(--gold); flex-shrink: 0; }
+
+    /* Date grid */
+    .date-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 24px; }
+    .date-day-label { text-align: center; font-size: .65rem; letter-spacing: .1em; color: var(--muted); padding: 4px 0; text-transform: uppercase; }
+    .date-btn {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius); border: 1px solid var(--border);
+      background: var(--bg3); font-size: .85rem; cursor: pointer;
+      transition: all var(--transition); color: var(--text);
+    }
+    .date-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+    .date-btn.selected { background: var(--gold); color: #0d0d0d; border-color: var(--gold); font-weight: 600; }
+    .date-btn:disabled { opacity: .25; cursor: not-allowed; }
+    .date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .date-nav-title { font-family: var(--font-head); font-size: 1.1rem; }
+    .date-nav-btn { background: var(--bg3); border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 8px; transition: all var(--transition); }
+    .date-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Time slots */
+    .time-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .time-slot {
+      padding: 12px; text-align: center; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--bg3); font-size: .85rem;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .time-slot:hover:not(.unavailable) { border-color: var(--gold); color: var(--gold); }
+    .time-slot.selected { background: var(--gold); color: #0d0d0d; border-color: var(--gold); font-weight: 600; }
+    .time-slot.unavailable { opacity: .25; cursor: not-allowed; text-decoration: line-through; }
+
+    /* Booking Summary */
+    .booking-summary {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 36px 32px;
+      position: sticky; top: 100px;
+    }
+    .bs-title { font-family: var(--font-head); font-size: 1.2rem; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .bs-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; font-size: .88rem; }
+    .bs-label { color: var(--muted); }
+    .bs-value { text-align: right; font-weight: 400; }
+    .bs-total { font-family: var(--font-head); font-size: 1.5rem; color: var(--gold); }
+    .bs-separator { height: 1px; background: var(--border); margin: 20px 0; }
+    .bs-empty { text-align: center; color: var(--muted); font-size: .85rem; padding: 20px; }
+    .bs-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: .75rem;
+      color: var(--gold); background: rgba(200,169,110,.08);
+      border: 1px solid rgba(200,169,110,.2); padding: 5px 12px; border-radius: 100px;
+      margin-top: 12px; width: 100%; justify-content: center;
+    }
+
+    .form-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 36px; gap: 12px; }
+
+    /* Success */
+    .success-state { text-align: center; padding: 20px 0; }
+    .success-icon { font-size: 4rem; margin-bottom: 24px; animation: bounce .6s ease; }
+    @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+    .success-title { font-family: var(--font-head); font-size: 2rem; font-weight: 300; margin-bottom: 12px; }
+    .success-sub { font-size: .9rem; color: var(--muted); line-height: 1.7; margin-bottom: 36px; }
+    .success-detail {
+      background: var(--bg3); border: 1px solid rgba(200,169,110,.15);
+      border-radius: var(--radius-lg); padding: 24px; text-align: left;
+      margin-bottom: 28px;
+    }
+    .sd-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: .88rem; }
+    .sd-row:last-child { border-bottom: none; }
+    .sd-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .sd-info .sd-key { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+    .sd-info .sd-val { margin-top: 2px; font-weight: 400; }
+
+    /* ─── CONTACT PAGE ───────────────────────────────────────── */
+    .contact-page { padding: 140px 40px 80px; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; max-width: 960px; margin: 0 auto; }
+    .contact-info h2 { font-family: var(--font-head); font-size: 2.4rem; font-weight: 300; margin-bottom: 16px; }
+    .contact-info p { font-size: .9rem; color: var(--muted); line-height: 1.75; margin-bottom: 40px; }
+    .contact-item { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 28px; }
+    .ci-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(200,169,110,.1); border: 1px solid rgba(200,169,110,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .ci-label { font-size: .72rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+    .ci-value { font-size: .95rem; margin-top: 4px; }
+    .ci-value a { color: var(--text); transition: color var(--transition); }
+    .ci-value a:hover { color: var(--gold); }
+    .hours-table { width: 100%; margin-top: 24px; }
+    .hours-table td { padding: 8px 0; font-size: .88rem; }
+    .hours-table td:first-child { color: var(--muted); }
+    .hours-table td:last-child { text-align: right; }
+
+    .contact-form-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 44px 40px;
+      position: relative; overflow: hidden;
+    }
+    .contact-form-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .contact-form-card h3 { font-family: var(--font-head); font-size: 1.6rem; font-weight: 300; margin-bottom: 28px; }
+    .social-links { display: flex; gap: 12px; margin-top: 32px; }
+    .social-link {
+      width: 44px; height: 44px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; transition: all var(--transition);
+    }
+    .social-link:hover { border-color: var(--gold); background: rgba(200,169,110,.08); transform: translateY(-2px); }
+
+    /* ─── Footer ─────────────────────────────────────────────── */
+    footer {
+      padding: 60px 40px 32px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner { max-width: 1160px; margin: 0 auto; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 40px; margin-bottom: 48px; }
+    .footer-logo .logo-main { font-family: var(--font-head); font-size: 1.4rem; color: var(--gold); }
+    .footer-logo .logo-sub { font-size: .62rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+    .footer-logo p { font-size: .82rem; color: var(--muted); margin-top: 14px; max-width: 280px; line-height: 1.65; }
+    .footer-nav h4 { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+    .footer-nav ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-nav ul li a { font-size: .85rem; color: var(--muted); transition: color var(--transition); }
+    .footer-nav ul li a:hover { color: var(--text); }
+    .footer-bottom { padding-top: 28px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-bottom p { font-size: .78rem; color: var(--muted); }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .hero { min-height: auto; padding: 100px 0 60px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+      .hero-desc { margin: 0 auto 44px; }
+      .hero-actions { justify-content: center; }
+      .hero-stats { justify-content: center; }
+      .hero-visual { display: none; }
+      .highlights-grid { grid-template-columns: 1fr; }
+      .highlight-item:first-child, .highlight-item:last-child { border-radius: 0; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .cta-inner { flex-direction: column; text-align: center; }
+      .cta-actions { justify-content: center; }
+      .booking-layout { grid-template-columns: 1fr; }
+      .booking-summary { position: static; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .section { padding: 80px 24px; }
+      .booking-page { padding: 120px 24px 60px; }
+      .contact-page { padding: 120px 24px 60px; }
+      .services-hero { padding: 120px 24px 60px; }
+      .form-card { padding: 36px 28px; }
+      .time-slots { grid-template-columns: repeat(4, 1fr); }
+      .footer-top { flex-direction: column; }
+    }
+    @media (max-width: 500px) {
+      .form-row { grid-template-columns: 1fr; }
+      .hero-stats { flex-wrap: wrap; gap: 24px; }
+      .date-grid { grid-template-columns: repeat(7, 1fr); gap: 4px; }
+      .date-btn { font-size: .75rem; }
+      .time-slots { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAVIGATION ══════════════════════════════════════════════ -->
+<nav id="navbar">
+  <a href="#" onclick="showPage('services')" class="nav-logo" style="text-decoration:none">
+    <img src="https://dcdn-us.mitiendanube.com/stores/007/513/945/themes/common/logo-2650926253834101337-1778273875-b5baade564f99aadfa3f5a1820e1041a1778273875-480-0.webp" alt="Studio Furinhos" style="height:44px;width:auto;object-fit:contain" />
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('services')" class="active" id="nav-services">Serviços</a></li>
+    <li><a href="#" onclick="showPage('booking')"  id="nav-booking">Agendamento</a></li>
+    <li><button id="adminTrigger" onclick="openAdminPanel()" title="Painel Admin">⚙</button></li>
+  </ul>
+  <a href="#" onclick="showPage('booking')" class="nav-cta">Agendar Agora</a>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="close-btn" onclick="toggleMenu()">✕</button>
+  <a href="#" onclick="showPage('services');toggleMenu()">Serviços</a>
+  <a href="#" onclick="showPage('booking');toggleMenu()">Agendamento</a>
+</div>
+
+<!-- ══ HOME PAGE ═══════════════════════════════════════════════ -->
+<div class="page active" id="page-services">
+  <div class="services-hero">
+    <div class="services-hero-content">
+      <span class="section-tag">Cardápio de serviços</span>
+      <h1 class="section-title" style="margin-top:12px">Nossos <em>Serviços</em></h1>
+    </div>
+
+    <div class="container">
+      <div class="services-grid">
+
+        <!-- CARD PROMOCIONAL -->
+        <div class="service-card" style="grid-column:1/-1;border-color:var(--gold);background:linear-gradient(135deg,rgba(184,148,90,.07),rgba(184,148,90,.02));position:relative;overflow:hidden;text-align:center">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px">
+            <span style="font-size:1.6rem">✨</span>
+            <span style="background:var(--gold);color:#fff;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;padding:4px 14px;border-radius:100px;font-weight:700;font-family:var(--font-body)">Promocional</span>
+          </div>
+          <div style="display:flex;align-items:baseline;justify-content:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+            <div class="service-name" style="margin-bottom:0">Perfuração + Joia Inclusa</div>
+            <span style="font-family:var(--font-head);font-size:1.5rem;color:var(--gold)">R$ 90,00</span>
+          </div>
+          <p class="service-desc" style="margin-bottom:20px">
+            Inclui perfuração + <em><strong>joia básica Ponto de Luz</strong></em> em titânio grau implante.<br>
+            <span style="color:var(--muted)">Regiões disponíveis:</span>
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;justify-content:center">
+            <span style="background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:.82rem;color:var(--text)">Lóbulo</span>
+            <span style="background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:.82rem;color:var(--text)">Hélix</span>
+            <span style="background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:.82rem;color:var(--text)">Flat</span>
+            <span style="background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:.82rem;color:var(--text)">Trágus</span>
+            <span style="background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:.82rem;color:var(--text)">Anti Hélix</span>
+            <span style="background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:6px 16px;font-size:.82rem;color:var(--text)">Minions</span>
+          </div>
+          <button class="service-book-btn" onclick="showPage('booking')">Agendar este serviço</button>
+        </div>
+
+        <div style="grid-column:1/-1;padding:16px 24px;background:rgba(184,148,90,.06);border:1px solid rgba(184,148,90,.15);border-radius:12px;text-align:center">
+          <p style="font-size:.85rem;color:var(--muted);margin-bottom:6px">* Os valores abaixo <strong style="color:var(--gold)">não incluem</strong> o valor da joia escolhida. O preço da joia é cobrado separadamente conforme o modelo selecionado.</p>
+          <p style="font-size:.85rem;color:var(--text);font-weight:600">Joias a partir de <span style="color:var(--gold);font-family:var(--font-head);font-size:1rem">R$ 65,00</span></p>
+        </div>
+
+        <!-- Piercings R$50 -->
+        <div class="service-card" style="grid-column:1/-1;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:24px">
+            <div style="flex:1;min-width:220px">
+              <div class="service-emoji">💉</div>
+              <div class="service-name">Perfurações</div>
+              <p class="service-desc">Todas as regiões com joia de titânio grau implante a escolher.</p>
+              <div class="service-footer" style="margin-top:16px">
+                <div class="service-price">R$ 50,00</div>
+                <div class="service-duration">~45 min</div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:260px">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text)">👂 Lóbulo</div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text)">✨ Hélix</div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text)">💫 Anti Hélix</div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text)">🌸 Flat</div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text)">🌹 Trágus</div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text)">🔮 Rook</div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text)">🌟 Minions</div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text)">👃 Nariz</div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;color:var(--text);grid-column:1/-1">🌙 Umbigo</div>
+              </div>
+            </div>
+          </div>
+          <button class="service-book-btn" style="margin-top:24px" onclick="showPage('booking')">Agendar este serviço</button>
+        </div>
+
+        <!-- Especiais -->
+        <div class="service-card">
+          <div class="service-emoji">💎</div>
+          <div class="service-name">Daith</div>
+          <p class="service-desc">Piercing interno da orelha, técnica avançada. Inclui joia de titânio grau implante.</p>
+          <div class="service-footer">
+            <div class="service-price">R$ 180,00</div>
+            <div class="service-duration">~45 min</div>
+          </div>
+          <button class="service-book-btn" onclick="bookService('Daith','R$ 180,00')">Agendar este serviço</button>
+        </div>
+
+        <div class="service-card">
+          <div class="service-emoji">🌀</div>
+          <div class="service-name">Australianos</div>
+          <p class="service-desc">Piercing de alta complexidade técnica. Procedimento exclusivo com joia de titânio grau implante.</p>
+          <div class="service-footer">
+            <div class="service-price">R$ 250,00</div>
+            <div class="service-duration">~45 min</div>
+          </div>
+          <button class="service-book-btn" onclick="bookService('Australianos','R$ 250,00')">Agendar este serviço</button>
+        </div>
+
+        <!-- Outros serviços -->
+        <div class="service-card">
+          <div class="service-emoji">⚡</div>
+          <div class="service-name">Laserterapia</div>
+          <p class="service-desc">Tratamento com laser para auxiliar na cicatrização e reduzir inflamações no local do piercing.</p>
+          <div class="service-footer">
+            <div class="service-price">R$ 60,00</div>
+            <div class="service-duration">~45 min</div>
+          </div>
+          <button class="service-book-btn" onclick="bookService('Laserterapia','R$ 60,00')">Agendar este serviço</button>
+        </div>
+
+        <div class="service-card">
+          <div class="service-emoji">✨</div>
+          <div class="service-name">Limpeza de Joias</div>
+          <p class="service-desc">Limpeza profissional das suas joias de titânio, garantindo higiene e brilho duradouros.</p>
+          <div class="service-footer">
+            <div class="service-price">R$ 60,00</div>
+            <div class="service-duration">~45 min</div>
+          </div>
+          <button class="service-book-btn" onclick="bookService('Limpeza de Joias','R$ 60,00')">Agendar este serviço</button>
+        </div>
+
+        <div class="service-card">
+          <div class="service-emoji">💍</div>
+          <div class="service-name">Atualização de Joia</div>
+          <p class="service-desc">Troca segura da joia após cicatrização completa. Disponível para todos os tipos de piercing.</p>
+          <div class="service-footer">
+            <div class="service-price">R$ 40,00</div>
+            <div class="service-duration">~45 min</div>
+          </div>
+          <button class="service-book-btn" onclick="bookService('Atualização de Joia','R$ 40,00')">Agendar este serviço</button>
+        </div>
+
+        <div class="service-card">
+          <div class="service-emoji">🛡️</div>
+          <div class="service-name">Retorno / Revisão</div>
+          <p class="service-desc">Consulta de acompanhamento para avaliar a cicatrização e tirar dúvidas. Gratuito nos primeiros 30 dias.</p>
+          <div class="service-footer">
+            <div class="service-price">Gratuito*</div>
+            <div class="service-duration">~45 min</div>
+          </div>
+          <button class="service-book-btn" onclick="bookService('Retorno / Revisão','Gratuito')">Agendar retorno</button>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;margin-top:40px">
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:24px">Não encontrou o que procura? Fale conosco no WhatsApp.</p>
+        <a class="btn btn-whatsapp" href="https://wa.me/5515997586900?text=Olá!%20Tenho%20uma%20dúvida%20sobre%20os%20serviços%20do%20Studio%20Furinhos." target="_blank">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.535 5.853L.057 23.887a.5.5 0 0 0 .611.633l6.278-1.641A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.946 0-3.773-.524-5.35-1.436l-.383-.228-3.977 1.04 1.058-3.862-.249-.397A9.956 9.956 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Falar no WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div><!-- /services -->
+
+<!-- ══ BOOKING PAGE ═════════════════════════════════════════════ -->
+<div class="page" id="page-booking">
+  <div class="booking-page">
+    <div style="max-width:1000px;margin:0 auto 40px">
+      <span class="section-tag">Agendamento online</span>
+      <h1 class="section-title" style="margin-top:12px">Reserve seu <em>horário</em></h1>
+    </div>
+
+    <!-- Steps -->
+    <div style="max-width:1000px;margin:0 auto">
+      <div class="steps-indicator" id="stepsIndicator">
+        <div class="step-item active" data-step="1"><div class="step-circle">1</div><div class="step-label">Serviço</div></div>
+        <div class="step-item"        data-step="2"><div class="step-circle">2</div><div class="step-label">Data &amp; Hora</div></div>
+        <div class="step-item"        data-step="3"><div class="step-circle">3</div><div class="step-label">Seus Dados</div></div>
+        <div class="step-item"        data-step="4"><div class="step-circle">4</div><div class="step-label">Confirmação</div></div>
+      </div>
+    </div>
+
+    <div class="booking-layout">
+
+      <!-- Form -->
+      <div class="form-card">
+
+        <!-- Step 1: Service (multi-select + quantity) -->
+        <div class="form-step active" id="step1">
+          <div class="form-step-title">Escolha os serviços</div>
+          <div class="form-step-sub">Selecione uma ou mais regiões.</div>
+
+          <style>
+            .ms-item {
+              border:1px solid var(--border); border-radius:var(--radius);
+              background:var(--bg3); margin-bottom:10px;
+              transition:all .2s; overflow:hidden;
+            }
+            .ms-item.checked { border-color:var(--gold); background:rgba(184,148,90,.06); }
+            .ms-row {
+              display:flex; align-items:center; gap:14px;
+              padding:14px 16px; cursor:pointer;
+            }
+            .ms-checkbox {
+              width:20px; height:20px; border-radius:5px; flex-shrink:0;
+              border:2px solid var(--border); background:var(--bg2);
+              display:flex; align-items:center; justify-content:center;
+              transition:all .2s; font-size:.8rem;
+            }
+            .ms-item.checked .ms-checkbox { background:var(--gold); border-color:var(--gold); color:#fff; }
+            .ms-icon { font-size:1.3rem; flex-shrink:0; }
+            .ms-label { flex:1; }
+            .ms-name { font-size:.9rem; font-weight:600; color:var(--text); }
+            .ms-dur  { font-size:.72rem; color:var(--muted); }
+            .ms-price-tag { font-family:var(--font-head); font-size:1rem; color:var(--gold); flex-shrink:0; }
+            .ms-qty-row {
+              display:none; align-items:center; gap:12px;
+              padding:0 16px 14px 52px;
+            }
+            .ms-item.checked .ms-qty-row { display:flex; }
+            .ms-qty-label { font-size:.75rem; color:var(--muted); }
+            .ms-qty-btns  { display:flex; gap:6px; }
+            .ms-qty-btn {
+              width:30px; height:30px; border-radius:8px;
+              border:1px solid var(--border); background:var(--bg2);
+              font-size:.85rem; font-weight:600; cursor:pointer;
+              color:var(--muted); transition:all .2s;
+              display:flex; align-items:center; justify-content:center;
+              font-family:var(--font-body);
+            }
+            .ms-qty-btn.active { background:var(--gold); border-color:var(--gold); color:#fff; }
+            .ms-qty-btn:hover:not(.active) { border-color:var(--gold); color:var(--gold); }
+            .ms-total-bar {
+              background:rgba(184,148,90,.08); border:1px solid rgba(184,148,90,.2);
+              border-radius:var(--radius); padding:12px 16px; margin-top:6px;
+              display:flex; justify-content:space-between; align-items:center;
+              font-size:.85rem;
+            }
+            .ms-total-val { font-family:var(--font-head); font-size:1.1rem; color:var(--gold); font-weight:600; }
+          </style>
+
+          <div id="multiServiceOptions">
+
+            <!-- PROMOCIONAL - topo -->
+            <div class="ms-item" id="ms-promo" onclick="toggleMS('promo')" style="border-color:rgba(184,148,90,.4);background:rgba(184,148,90,.04)">
+              <div class="ms-row">
+                <div class="ms-checkbox" id="chk-promo"></div>
+                <span class="ms-icon">✨</span>
+                <span class="ms-label">
+                  <span class="ms-name">Promocional — Perfuração + Joia básica Ponto de Luz inclusa</span>
+                  <span class="ms-dur">~45 min</span>
+                </span>
+                <span class="ms-price-tag">R$ 90,00/região</span>
+              </div>
+              <div class="ms-qty-row" onclick="event.stopPropagation()" style="flex-direction:column;align-items:flex-start;gap:10px;padding-bottom:16px">
+                <span class="ms-qty-label">Escolha as regiões:</span>
+                <div style="display:flex;flex-wrap:wrap;gap:8px" id="promoRegions">
+                  <div class="promo-region-btn" onclick="event.stopPropagation();togglePromoRegion(event,'promo-lobulo','Lóbulo',90)">Lóbulo</div>
+                  <div class="promo-region-btn" onclick="event.stopPropagation();togglePromoRegion(event,'promo-helix','Hélix',90)">Hélix</div>
+                  <div class="promo-region-btn" onclick="event.stopPropagation();togglePromoRegion(event,'promo-flat','Flat',90)">Flat</div>
+                  <div class="promo-region-btn" onclick="event.stopPropagation();togglePromoRegion(event,'promo-tragus','Trágus',90)">Trágus</div>
+                  <div class="promo-region-btn" onclick="event.stopPropagation();togglePromoRegion(event,'promo-antihelix','Anti Hélix',90)">Anti Hélix</div>
+                  <div class="promo-region-btn" onclick="event.stopPropagation();togglePromoRegion(event,'promo-minions','Minions',90)">Minions</div>
+                </div>
+                <span style="font-size:.72rem;color:var(--muted)">* R$ 90,00 por região selecionada</span>
+              </div>
+            </div>
+            <style>
+              .promo-region-btn { padding:7px 16px; border-radius:100px; border:1px solid var(--border); background:var(--bg2); font-size:.82rem; cursor:pointer; transition:all .2s; color:var(--muted); user-select:none; }
+              .promo-region-btn.active { background:var(--gold); border-color:var(--gold); color:#fff; font-weight:600; }
+            </style>
+
+            <!-- Perfurações R$50 com quantidade -->
+            <div class="ms-item" id="ms-lobulo" onclick="toggleMS('lobulo')"><div class="ms-row"><div class="ms-checkbox" id="chk-lobulo"></div><span class="ms-icon">👂</span><span class="ms-label"><span class="ms-name">Lóbulo</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div><div class="ms-qty-row"><span class="ms-qty-label">Quantidade:</span><div class="ms-qty-btns"><button class="ms-qty-btn active" onclick="setQty(event,'lobulo',1)">1</button><button class="ms-qty-btn" onclick="setQty(event,'lobulo',2)">2</button><button class="ms-qty-btn" onclick="setQty(event,'lobulo',3)">3</button></div></div></div>
+
+            <div class="ms-item" id="ms-helix" onclick="toggleMS('helix')"><div class="ms-row"><div class="ms-checkbox" id="chk-helix"></div><span class="ms-icon">✨</span><span class="ms-label"><span class="ms-name">Hélix</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div><div class="ms-qty-row"><span class="ms-qty-label">Quantidade:</span><div class="ms-qty-btns"><button class="ms-qty-btn active" onclick="setQty(event,'helix',1)">1</button><button class="ms-qty-btn" onclick="setQty(event,'helix',2)">2</button></div></div></div>
+
+            <div class="ms-item" id="ms-antihelix" onclick="toggleMS('antihelix')"><div class="ms-row"><div class="ms-checkbox" id="chk-antihelix"></div><span class="ms-icon">💫</span><span class="ms-label"><span class="ms-name">Anti Hélix</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div><div class="ms-qty-row"><span class="ms-qty-label">Quantidade:</span><div class="ms-qty-btns"><button class="ms-qty-btn active" onclick="setQty(event,'antihelix',1)">1</button><button class="ms-qty-btn" onclick="setQty(event,'antihelix',2)">2</button></div></div></div>
+
+            <div class="ms-item" id="ms-flat" onclick="toggleMS('flat')"><div class="ms-row"><div class="ms-checkbox" id="chk-flat"></div><span class="ms-icon">🌸</span><span class="ms-label"><span class="ms-name">Flat</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div><div class="ms-qty-row"><span class="ms-qty-label">Quantidade:</span><div class="ms-qty-btns"><button class="ms-qty-btn active" onclick="setQty(event,'flat',1)">1</button><button class="ms-qty-btn" onclick="setQty(event,'flat',2)">2</button></div></div></div>
+
+            <div class="ms-item" id="ms-tragus" onclick="toggleMS('tragus')"><div class="ms-row"><div class="ms-checkbox" id="chk-tragus"></div><span class="ms-icon">🌹</span><span class="ms-label"><span class="ms-name">Trágus</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div><div class="ms-qty-row"><span class="ms-qty-label">Quantidade:</span><div class="ms-qty-btns"><button class="ms-qty-btn active" onclick="setQty(event,'tragus',1)">1</button><button class="ms-qty-btn" onclick="setQty(event,'tragus',2)">2</button></div></div></div>
+
+            <div class="ms-item" id="ms-rook" onclick="toggleMS('rook')"><div class="ms-row"><div class="ms-checkbox" id="chk-rook"></div><span class="ms-icon">🔮</span><span class="ms-label"><span class="ms-name">Rook</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div><div class="ms-qty-row"><span class="ms-qty-label">Quantidade:</span><div class="ms-qty-btns"><button class="ms-qty-btn active" onclick="setQty(event,'rook',1)">1</button><button class="ms-qty-btn" onclick="setQty(event,'rook',2)">2</button></div></div></div>
+
+            <div class="ms-item" id="ms-minions" onclick="toggleMS('minions')"><div class="ms-row"><div class="ms-checkbox" id="chk-minions"></div><span class="ms-icon">🌟</span><span class="ms-label"><span class="ms-name">Minions</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div><div class="ms-qty-row"><span class="ms-qty-label">Quantidade:</span><div class="ms-qty-btns"><button class="ms-qty-btn active" onclick="setQty(event,'minions',1)">1</button><button class="ms-qty-btn" onclick="setQty(event,'minions',2)">2</button><button class="ms-qty-btn" onclick="setQty(event,'minions',3)">3</button></div></div></div>
+
+            <div class="ms-item" id="ms-nariz" onclick="toggleMS('nariz')"><div class="ms-row"><div class="ms-checkbox" id="chk-nariz"></div><span class="ms-icon">👃</span><span class="ms-label"><span class="ms-name">Nariz</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div></div>
+
+            <!-- Sem quantidade -->
+            <div class="ms-item" id="ms-umbigo" onclick="toggleMS('umbigo')"><div class="ms-row"><div class="ms-checkbox" id="chk-umbigo"></div><span class="ms-icon">🌙</span><span class="ms-label"><span class="ms-name">Umbigo</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 50,00</span></div></div>
+
+            <div class="ms-item" id="ms-daith" onclick="toggleMS('daith')"><div class="ms-row"><div class="ms-checkbox" id="chk-daith"></div><span class="ms-icon">💎</span><span class="ms-label"><span class="ms-name">Daith</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 180,00</span></div></div>
+
+            <div class="ms-item" id="ms-australianos" onclick="toggleMS('australianos')"><div class="ms-row"><div class="ms-checkbox" id="chk-australianos"></div><span class="ms-icon">🌀</span><span class="ms-label"><span class="ms-name">Australianos</span><span class="ms-dur">~45 min · + joia a escolher</span></span><span class="ms-price-tag">R$ 250,00</span></div></div>
+
+            <div class="ms-item" id="ms-laser" onclick="toggleMS('laser')"><div class="ms-row"><div class="ms-checkbox" id="chk-laser"></div><span class="ms-icon">⚡</span><span class="ms-label"><span class="ms-name">Laserterapia</span><span class="ms-dur">~45 min</span></span><span class="ms-price-tag">R$ 60,00</span></div></div>
+
+            <div class="ms-item" id="ms-limpeza" onclick="toggleMS('limpeza')"><div class="ms-row"><div class="ms-checkbox" id="chk-limpeza"></div><span class="ms-icon">✨</span><span class="ms-label"><span class="ms-name">Limpeza de Joias</span><span class="ms-dur">~45 min</span></span><span class="ms-price-tag">R$ 60,00</span></div></div>
+
+            <div class="ms-item" id="ms-atualizacao" onclick="toggleMS('atualizacao')"><div class="ms-row"><div class="ms-checkbox" id="chk-atualizacao"></div><span class="ms-icon">💍</span><span class="ms-label"><span class="ms-name">Atualização de Joia</span><span class="ms-dur">~45 min</span></span><span class="ms-price-tag">R$ 40,00</span></div></div>
+
+            <div class="ms-item" id="ms-retorno" onclick="toggleMS('retorno')"><div class="ms-row"><div class="ms-checkbox" id="chk-retorno"></div><span class="ms-icon">🛡️</span><span class="ms-label"><span class="ms-name">Retorno / Revisão</span><span class="ms-dur">~45 min</span></span><span class="ms-price-tag" style="color:var(--muted)">Grátis</span></div></div>
+
+          </div>
+
+          <div class="form-nav" style="margin-top:20px">
+            <span></span>
+            <button class="btn btn-gold" onclick="nextStep(1)" id="btn-next1" disabled style="opacity:.4;cursor:not-allowed">Próximo →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Date & Time -->
+        <div class="form-step" id="step2">
+          <div class="form-step-title">Data e horário</div>
+          <div class="form-step-sub">Escolha o melhor dia e hora para você</div>
+
+          <div class="date-nav">
+            <button class="date-nav-btn" onclick="changeMonth(-1)">‹ Anterior</button>
+            <span class="date-nav-title" id="monthTitle"></span>
+            <button class="date-nav-btn" onclick="changeMonth(1)">Próximo ›</button>
+          </div>
+          <div class="date-grid" id="calendarGrid">
+            <div class="date-day-label">Dom</div>
+            <div class="date-day-label">Seg</div>
+            <div class="date-day-label">Ter</div>
+            <div class="date-day-label">Qua</div>
+            <div class="date-day-label">Qui</div>
+            <div class="date-day-label">Sex</div>
+            <div class="date-day-label">Sáb</div>
+          </div>
+
+          <div style="margin-top:28px;margin-bottom:12px">
+            <label class="form-label" id="timeTitle" style="display:none">Horários disponíveis</label>
+            <div class="time-slots" id="timeSlots"></div>
+          </div>
+
+          <div class="form-nav">
+            <button class="btn btn-outline" onclick="prevStep(2)">← Voltar</button>
+            <button class="btn btn-gold" onclick="nextStep(2)" id="btn-next2" disabled style="opacity:.4;cursor:not-allowed">Próximo →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Personal info -->
+        <div class="form-step" id="step3">
+          <div class="form-step-title">Seus dados</div>
+          <div class="form-step-sub">Para confirmar seu agendamento</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nome completo *</label>
+              <input type="text" id="clientName" placeholder="Maria Silva" oninput="updateSummary()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp *</label>
+              <input type="tel" id="clientPhone" placeholder="(15) 99758-6900" oninput="formatPhone(this);updateSummary()" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail (opcional)</label>
+            <input type="email" id="clientEmail" placeholder="maria@email.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Observações</label>
+            <textarea id="clientNotes" rows="3" placeholder="Ex: primeira vez fazendo piercing, alergia a algum metal, dúvidas..."></textarea>
+          </div>
+
+          <div style="background:rgba(200,169,110,.06);border:1px solid rgba(200,169,110,.15);border-radius:var(--radius);padding:16px;margin-top:4px;font-size:.82rem;color:var(--muted);line-height:1.6">
+            ℹ️ Ao confirmar, você receberá uma mensagem de confirmação no WhatsApp informado acima.
+          </div>
+
+          <div class="form-nav">
+            <button class="btn btn-outline" onclick="prevStep(3)">← Voltar</button>
+            <button class="btn btn-gold" onclick="nextStep(3)">Revisar →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Confirm -->
+        <div class="form-step" id="step4">
+          <div class="form-step-title">Confirme seu agendamento</div>
+          <div class="form-step-sub">Revise os detalhes antes de confirmar</div>
+
+          <div class="success-detail" id="confirmDetail">
+            <!-- populated by JS -->
+          </div>
+
+          <div style="background:rgba(200,169,110,.06);border:1px solid rgba(200,169,110,.15);border-radius:var(--radius);padding:16px;margin-bottom:20px;font-size:.82rem;color:var(--muted);line-height:1.7">
+            🔔 Ao confirmar, abriremos o WhatsApp com uma mensagem pré-preenchida para finalizar seu agendamento com a gente!
+          </div>
+
+          <div class="form-nav">
+            <button class="btn btn-outline" onclick="prevStep(4)">← Editar</button>
+            <button class="btn btn-gold" onclick="confirmBooking()" style="flex:1;max-width:260px">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.535 5.853L.057 23.887a.5.5 0 0 0 .611.633l6.278-1.641A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.946 0-3.773-.524-5.35-1.436l-.383-.228-3.977 1.04 1.058-3.862-.249-.397A9.956 9.956 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+              Confirmar via WhatsApp
+            </button>
+          </div>
+        </div>
+
+        <!-- Success -->
+        <div class="form-step" id="stepSuccess">
+          <div class="success-state">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">Agendamento enviado!</div>
+            <p class="success-sub">Sua solicitação foi enviada pelo WhatsApp.<br>Aguarde nossa confirmação em breve!</p>
+            <div class="success-detail" id="successDetail"></div>
+            <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+              <button class="btn btn-gold" onclick="resetBooking()">Fazer novo agendamento</button>
+              <button class="btn btn-outline" onclick="showPage('services')">Ver Serviços</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Summary Sidebar -->
+      <div class="booking-summary">
+        <div class="bs-title">🗓 Resumo</div>
+        <div id="summaryContent">
+          <p class="bs-empty">Preencha o formulário para ver o resumo do seu agendamento.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /booking -->
+
+<!-- ══ CONTACT PAGE ════════════════════════════════════════════ -->
+<div class="page" id="page-contact">
+  <div class="contact-page">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <span class="section-tag">Fale conosco</span>
+        <h2 style="margin-top:12px">Estamos<br><em style="color:var(--gold);font-style:italic">aqui para você</em></h2>
+        <p style="margin-top:16px">Tem alguma dúvida, quer saber mais sobre nossos serviços ou precisa de orientações pós-piercing? Entre em contato!</p>
+
+        <div class="contact-item">
+          <div class="ci-icon">📍</div>
+          <div>
+            <div class="ci-label">Endereço</div>
+            <div class="ci-value"><a href="https://maps.google.com/?q=Estrada+Municipal+Joaquim+de+Campos+Vieira+200+Jardim+Mantovani+Tatui+SP" target="_blank">Estr. Mun. Joaquim de Campos Vieira, 200<br>Jardim Mantovani, Tatuí – SP, 18275-778</a></div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="ci-icon">📱</div>
+          <div>
+            <div class="ci-label">WhatsApp</div>
+            <div class="ci-value"><a href="https://wa.me/5515997586900" target="_blank">(15) 99758-6900</a></div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="ci-icon">📸</div>
+          <div>
+            <div class="ci-label">Instagram</div>
+            <div class="ci-value"><a href="https://instagram.com/_studiofurinhos" target="_blank">@_studiofurinhos</a></div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="ci-icon">🕐</div>
+          <div>
+            <div class="ci-label">Horário de Atendimento</div>
+            <div class="ci-value" style="margin-top:8px">
+              <table class="hours-table">
+                <tr><td>Segunda a Sexta</td><td>09h30 – 22h</td></tr>
+                <tr><td>Sábado</td><td>09h30 – 18h</td></tr>
+                <tr><td style="color:var(--muted)">Domingo</td><td style="color:var(--muted)">Fechado</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="social-links" style="margin-top:8px">
+          <!-- Instagram -->
+          <a href="https://instagram.com/_studiofurinhos" target="_blank" class="social-link" title="Instagram" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border:none">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <!-- WhatsApp -->
+          <a href="https://wa.me/5515997586900" target="_blank" class="social-link" title="WhatsApp" style="background:#25D366;border:none">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.535 5.853L.057 23.887a.5.5 0 00.611.633l6.278-1.641A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.946 0-3.773-.524-5.35-1.436l-.383-.228-3.977 1.04 1.058-3.862-.249-.397A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-form-card">
+        <h3>Envie uma mensagem</h3>
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <input type="text" id="contactName" placeholder="Seu nome" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">WhatsApp</label>
+          <input type="tel" id="contactPhone" placeholder="(15) 99758-6900" oninput="formatPhone(this)" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assunto</label>
+          <select id="contactSubject">
+            <option value="">Selecione...</option>
+            <option>Dúvidas sobre piercings</option>
+            <option>Cuidados pós-piercing</option>
+            <option>Informações sobre joias</option>
+            <option>Agendar consulta</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mensagem</label>
+          <textarea id="contactMessage" rows="4" placeholder="Escreva sua mensagem aqui..."></textarea>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-whatsapp" href="#" id="contactWhatsappBtn" onclick="sendContactWhatsapp()" style="flex:1;min-width:160px">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.535 5.853L.057 23.887a.5.5 0 0 0 .611.633l6.278-1.641A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.946 0-3.773-.524-5.35-1.436l-.383-.228-3.977 1.04 1.058-3.862-.249-.397A9.956 9.956 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            Enviar via WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /contact -->
+
+<!-- ══ FOOTER ═══════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="gold-line" style="max-width:200px;margin-bottom:48px"></div>
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="https://dcdn-us.mitiendanube.com/stores/007/513/945/themes/common/logo-2650926253834101337-1778273875-b5baade564f99aadfa3f5a1820e1041a1778273875-480-0.webp" alt="Studio Furinhos" style="height:48px;width:auto;object-fit:contain;margin-bottom:6px;display:block" />
+        <p>Piercing profissional com biossegurança completa e joias exclusivas em Tatuí – SP.</p>
+      </div>
+      <div class="footer-nav">
+        <h4>Páginas</h4>
+        <ul>
+          <li><a href="#" onclick="showPage('services')">Serviços</a></li>
+          <li><a href="#" onclick="showPage('booking')">Agendamento</a></li>
+          <li><a href="#" onclick="showPage('contact')">Contato</a></li>
+        </ul>
+      </div>
+      <div class="footer-nav">
+        <h4>Redes Sociais</h4>
+        <ul>
+          <li><a href="https://instagram.com/_studiofurinhos" target="_blank">Instagram</a></li>
+          <li><a href="https://wa.me/5515997586900" target="_blank">WhatsApp</a></li>
+        </ul>
+      </div>
+      <div class="footer-nav">
+        <h4>Contato</h4>
+        <ul>
+          <li><a href="https://wa.me/5515997586900" target="_blank">(15) 99758-6900</a></li>
+          <li><a href="https://maps.google.com/?q=Estrada+Municipal+Joaquim+de+Campos+Vieira+200+Jardim+Mantovani+Tatui+SP" target="_blank">Estr. Mun. Joaquim de Campos Vieira, 200</a></li>
+          <li><a href="https://maps.google.com/?q=Estrada+Municipal+Joaquim+de+Campos+Vieira+200+Jardim+Mantovani+Tatui+SP" target="_blank">Jardim Mantovani, Tatuí – SP</a></li>
+          <li><a href="https://maps.google.com/?q=Estrada+Municipal+Joaquim+de+Campos+Vieira+200+Jardim+Mantovani+Tatui+SP" target="_blank">CEP 18275-778</a></li>
+          <li><a href="#">Seg–Sex: 09h30–22h</a></li>
+          <li><a href="#">Sáb: 09h30–18h</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Studio Furinhos. Todos os direitos reservados.</p>
+      <p style="color:var(--gold)">♦ Feito com cuidado em Tatuí – SP &nbsp;·&nbsp; <span onclick="openAdminPanel()" style="cursor:pointer;opacity:.5;font-size:.75rem;color:var(--muted)" title="Painel Admin">⚙ Admin</span></p>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ FLOATING WHATSAPP ════════════════════════════════════════ -->
+<a class="whatsapp-float" href="https://wa.me/5515997586900?text=Olá!%20Vim%20pelo%20site%20do%20Studio%20Furinhos%20e%20gostaria%20de%20mais%20informações." target="_blank" title="Fale conosco">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.535 5.853L.057 23.887a.5.5 0 0 0 .611.633l6.278-1.641A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.946 0-3.773-.524-5.35-1.436l-.383-.228-3.977 1.04 1.058-3.862-.249-.397A9.956 9.956 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+  </svg>
+</a>
+
+<!-- ══ JAVASCRIPT ════════════════════════════════════════════════ -->
+<script>
+// ── Config ────────────────────────────────────────────────────
+const WHATSAPP_NUMBER = '5515997586900'; // ← ALTERE AQUI para seu número real
+
+// ── Booking state ─────────────────────────────────────────────
+let bookingData = {
+  service: '', price: '', duration: '',
+  date: '', time: '', name: '', phone: '', email: '', notes: ''
+};
+
+let currentStep = 1;
+let calendarDate = new Date();
+
+// ── Page navigation ───────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (page === 'booking') renderCalendar();
+  return false;
+}
+
+// ── Mobile menu ───────────────────────────────────────────────
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ── Multi-select service state ────────────────────────────────
+const MS_SERVICES = {
+  lobulo:    { name:'Lóbulo',              price:50,  hasQty:true },
+  helix:     { name:'Hélix',               price:50,  hasQty:true },
+  antihelix: { name:'Anti Hélix',          price:50,  hasQty:true },
+  flat:      { name:'Flat',                price:50,  hasQty:true },
+  tragus:    { name:'Trágus',              price:50,  hasQty:true },
+  rook:      { name:'Rook',                price:50,  hasQty:true },
+  minions:   { name:'Minions',             price:50,  hasQty:true },
+  nariz:     { name:'Nariz',               price:50,  hasQty:false },
+  umbigo:    { name:'Umbigo',              price:50,  hasQty:false },
+  daith:     { name:'Daith',               price:180, hasQty:false },
+  australianos:{ name:'Australianos',      price:250, hasQty:false },
+  promo:     { name:'Promocional',         price:0,   hasQty:false, isPromo:true },
+  laser:     { name:'Laserterapia',        price:60,  hasQty:false },
+  limpeza:   { name:'Limpeza de Joias',    price:60,  hasQty:false },
+  atualizacao:{ name:'Atualização de Joia',price:40,  hasQty:false },
+  retorno:   { name:'Retorno / Revisão',   price:0,   hasQty:false },
+};
+let msSelected = {}; // { key: qty }
+let promoRegions = {}; // { key: { name, price } }
+
+function toggleMS(key) {
+  if (msSelected[key]) {
+    delete msSelected[key];
+    document.getElementById('ms-'+key).classList.remove('checked');
+    document.getElementById('chk-'+key).textContent = '';
+    if (key === 'promo') {
+      promoRegions = {};
+      document.querySelectorAll('.promo-region-btn').forEach(b => b.classList.remove('active'));
+    }
+  } else {
+    msSelected[key] = 1;
+    document.getElementById('ms-'+key).classList.add('checked');
+    document.getElementById('chk-'+key).textContent = '✓';
+    if (key !== 'promo') {
+      const btns = document.querySelectorAll(`#ms-${key} .ms-qty-btn`);
+      btns.forEach((b,i) => b.classList.toggle('active', i===0));
+    }
+  }
+  updateMSTotal();
+}
+
+// Region toggle for Promocional
+function togglePromoRegion(e, key, name, price) {
+  e.stopPropagation();
+  const btn = e.currentTarget || e.target.closest('.promo-region-btn');
+  if (promoRegions[key]) {
+    delete promoRegions[key];
+    btn.classList.remove('active');
+  } else {
+    promoRegions[key] = { name, price };
+    btn.classList.add('active');
+  }
+  updateMSTotal();
+}
+
+function toggleMS(key) {
+  if (msSelected[key]) {
+    delete msSelected[key];
+    document.getElementById('ms-'+key).classList.remove('checked');
+    document.getElementById('chk-'+key).textContent = '';
+  } else {
+    msSelected[key] = 1;
+    document.getElementById('ms-'+key).classList.add('checked');
+    document.getElementById('chk-'+key).textContent = '✓';
+    // Reset qty buttons to 1
+    const btns = document.querySelectorAll(`#ms-${key} .ms-qty-btn`);
+    btns.forEach((b,i) => b.classList.toggle('active', i===0));
+  }
+  updateMSTotal();
+}
+
+function setQty(e, key, qty) {
+  e.stopPropagation();
+  msSelected[key] = qty;
+  const btns = document.querySelectorAll(`#ms-${key} .ms-qty-btn`);
+  btns.forEach((b,i) => b.classList.toggle('active', i === qty-1));
+  updateMSTotal();
+}
+
+function updateMSTotal() {
+  const keys = Object.keys(msSelected);
+  const btn = document.getElementById('btn-next1');
+
+  if (!keys.length) {
+    btn.disabled = true; btn.style.opacity='.4'; btn.style.cursor='not-allowed';
+    bookingData.service = ''; bookingData.price = ''; bookingData.promoDetails = []; bookingData.serviceLines = [];
+    updateSummary(); return;
+  }
+
+  let total = 0;
+  const lines = [];
+  const serviceLines = []; // for summary: [{name, price}]
+
+  keys.forEach(k => {
+    if (k === 'promo') {
+      const regions = Object.values(promoRegions);
+      if (regions.length) {
+        regions.forEach(r => {
+          total += r.price;
+          serviceLines.push({ name: `Promocional — ${r.name}`, price: `R$ ${r.price},00` });
+          lines.push(`Promocional ${r.name}`);
+        });
+      } else {
+        lines.push('Promocional (selecione região)');
+      }
+    } else {
+      const s = MS_SERVICES[k];
+      const qty = msSelected[k] || 1;
+      const subtotal = s.price * qty;
+      total += subtotal;
+      if (qty > 1) {
+        for (let i = 0; i < qty; i++) {
+          serviceLines.push({ name: `${s.name}`, price: `R$ ${s.price},00` });
+        }
+        lines.push(`${s.name} x${qty}`);
+      } else {
+        serviceLines.push({ name: s.name, price: s.price > 0 ? `R$ ${s.price},00` : 'Gratuito' });
+        lines.push(s.name);
+      }
+    }
+  });
+
+  const totalFmt = total > 0 ? `R$ ${total.toFixed(2).replace('.',',')}` : 'Gratuito';
+  bookingData.service      = lines.join(' + ');
+  bookingData.price        = totalFmt;
+  bookingData.duration     = '~45 min';
+  bookingData.promoDetails = serviceLines.filter(l => l.name.startsWith('Promocional'));
+  bookingData.serviceLines = serviceLines;
+
+  btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer';
+  updateSummary();
+}
+
+function resetMultiSelect() {
+  msSelected = {};
+  promoRegions = {};
+  Object.keys(MS_SERVICES).forEach(k => {
+    const el = document.getElementById('ms-'+k);
+    const chk = document.getElementById('chk-'+k);
+    if (el) el.classList.remove('checked');
+    if (chk) chk.textContent = '';
+    const btns = document.querySelectorAll(`#ms-${k} .ms-qty-btn`);
+    btns.forEach((b,i) => b.classList.toggle('active', i===0));
+  });
+  document.querySelectorAll('.promo-region-btn').forEach(b => b.classList.remove('active'));
+}
+
+function bookService(name, price) {
+  showPage('booking');
+}
+
+// ── Step navigation ───────────────────────────────────────────
+function nextStep(from) {
+  if (from === 3) {
+    const name  = document.getElementById('clientName').value.trim();
+    const phone = document.getElementById('clientPhone').value.trim();
+    if (!name || !phone) { alert('Preencha nome e WhatsApp para continuar.'); return; }
+    bookingData.name  = name;
+    bookingData.phone = phone;
+    bookingData.email = document.getElementById('clientEmail').value.trim();
+    bookingData.notes = document.getElementById('clientNotes').value.trim();
+    buildConfirmDetail();
+  }
+  currentStep = from + 1;
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + currentStep).classList.add('active');
+  updateStepIndicator();
+  updateSummary();
+}
+
+function prevStep(from) {
+  currentStep = from - 1;
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + currentStep).classList.add('active');
+  updateStepIndicator();
+}
+
+function updateStepIndicator() {
+  document.querySelectorAll('.step-item').forEach((item, i) => {
+    const n = i + 1;
+    item.classList.remove('active', 'done');
+    if (n < currentStep) item.classList.add('done');
+    if (n === currentStep) item.classList.add('active');
+  });
+}
+
+// ── Calendar ──────────────────────────────────────────────────
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function renderCalendar() {
+  const year  = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+  document.getElementById('monthTitle').textContent = MONTHS[month] + ' ' + year;
+
+  const grid = document.getElementById('calendarGrid');
+  const all = Array.from(grid.children);
+  all.slice(7).forEach(c => c.remove());
+
+  const firstDay   = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Load booked slots per date safely
+  let bookedByDate = {};
+  try {
+    const appts = loadAppts().filter(a => a.status !== 'cancelled');
+    appts.forEach(a => {
+      if (!bookedByDate[a.date]) bookedByDate[a.date] = [];
+      bookedByDate[a.date].push(a.time);
+    });
+  } catch(e) { bookedByDate = {}; }
+
+  // Helper: check if a day has any free slot
+  function hasFreeSlot(dateObj, dateStr) {
+    try {
+      const isSat  = dateObj.getDay() === 6;
+      const endMin = isSat ? 18*60 : 22*60;
+      const lunch  = ['12:30','13:15'];
+      const booked = bookedByDate[dateStr] || [];
+      for (let m = 9*60+30; m < endMin; m += 45) {
+        const t = String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0');
+        if (!lunch.includes(t) && !booked.includes(t)) return true;
+      }
+      return false;
+    } catch(e) { return true; }
+  }
+
+  for (let i = 0; i < firstDay; i++) {
+    grid.appendChild(document.createElement('div'));
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date    = new Date(year, month, d);
+    const btn     = document.createElement('button');
+    const isSun   = date.getDay() === 0;
+    const isPast  = date < today;
+    const dateStr = year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const noSlots = !isSun && !isPast && !hasFreeSlot(date, dateStr);
+
+    btn.className   = 'date-btn';
+    btn.textContent = d;
+
+    if (isSun || isPast || noSlots) {
+      btn.disabled = true;
+      if (noSlots) {
+        btn.style.opacity = '0.25';
+        btn.style.cursor  = 'not-allowed';
+        btn.style.textDecoration = 'line-through';
+        btn.title = 'Lotado';
+      }
+    } else {
+      if (bookingData.date === dateStr) btn.classList.add('selected');
+      btn.onclick = () => selectDate(btn, dateStr, date);
+    }
+    grid.appendChild(btn);
+  }
+}
+
+function selectDate(btn, dateStr, dateObj) {
+  document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  bookingData.date = dateStr;
+  bookingData.time = '';
+  renderTimeSlots(dateObj);
+  checkStep2();
+  updateSummary();
+}
+
+function renderTimeSlots(date) {
+  const container = document.getElementById('timeSlots');
+  const title     = document.getElementById('timeTitle');
+  title.style.display = 'block';
+  container.innerHTML = '';
+
+  const isSat = date.getDay() === 6;
+  const endHour = isSat ? 18*60 : 22*60; // minutes from midnight
+  const startMin = 9*60 + 30; // 09:30
+
+  // Generate slots every 45 minutes
+  const slots = [];
+  for (let m = startMin; m < endHour; m += 45) {
+    const h = String(Math.floor(m / 60)).padStart(2, '0');
+    const min = String(m % 60).padStart(2, '0');
+    slots.push(`${h}:${min}`);
+  }
+
+  // Intervalo de almoço: 12:30 e 13:15
+  const lunchBlocked = ['12:30','13:15'];
+
+  // Horários já agendados nessa data (pendente ou confirmado)
+  const dateStr = date.toISOString().split('T')[0];
+  const bookedTimes = loadAppts()
+    .filter(a => a.date === dateStr && a.status !== 'cancelled')
+    .map(a => a.time);
+
+  slots.forEach(t => {
+    const blocked = lunchBlocked.includes(t) || bookedTimes.includes(t);
+    const div = document.createElement('div');
+    div.className = 'time-slot' + (blocked ? ' unavailable' : '');
+    div.textContent = t;
+    if (!blocked) {
+      div.onclick = () => selectTime(div, t);
+    }
+    if (bookingData.time === t) div.classList.add('selected');
+    container.appendChild(div);
+  });
+}
+
+function selectTime(div, time) {
+  document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+  div.classList.add('selected');
+  bookingData.time = time;
+  checkStep2();
+  updateSummary();
+}
+
+function checkStep2() {
+  const btn = document.getElementById('btn-next2');
+  const ok  = bookingData.date && bookingData.time;
+  btn.disabled = !ok;
+  btn.style.opacity = ok ? '1' : '.4';
+  btn.style.cursor  = ok ? 'pointer' : 'not-allowed';
+}
+
+function changeMonth(delta) {
+  calendarDate.setMonth(calendarDate.getMonth() + delta);
+  bookingData.date = '';
+  bookingData.time = '';
+  document.getElementById('timeSlots').innerHTML = '';
+  document.getElementById('timeTitle').style.display = 'none';
+  checkStep2();
+  renderCalendar();
+  updateSummary();
+}
+
+// ── Summary ───────────────────────────────────────────────────
+function updateSummary() {
+  const container = document.getElementById('summaryContent');
+  const d = bookingData;
+
+  if (!d.service) {
+    container.innerHTML = '<p class="bs-empty">Preencha o formulário para ver o resumo do seu agendamento.</p>';
+    return;
+  }
+
+  const dateFormatted = d.date
+    ? new Date(d.date + 'T12:00').toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' })
+    : '—';
+
+  const serviceLines = d.serviceLines || [];
+  const serviceRows = serviceLines.length
+    ? serviceLines.map(p => `<div class="bs-row"><span class="bs-label">${p.name}</span><span class="bs-value" style="color:var(--gold)">${p.price}</span></div>`).join('')
+    : (d.service ? `<div class="bs-row"><span class="bs-label">Serviço</span><span class="bs-value">${d.service}</span></div>` : '');
+
+  container.innerHTML = `
+    ${serviceRows}
+    ${d.duration ? `<div class="bs-row"><span class="bs-label">Duração</span><span class="bs-value">${d.duration}</span></div>` : ''}
+    ${d.date ? `<div class="bs-row"><span class="bs-label">Data</span><span class="bs-value">${dateFormatted}</span></div>` : ''}
+    ${d.time ? `<div class="bs-row"><span class="bs-label">Horário</span><span class="bs-value">${d.time}</span></div>` : ''}
+    ${d.name ? `<div class="bs-separator"></div><div class="bs-row"><span class="bs-label">Nome</span><span class="bs-value">${d.name}</span></div>` : ''}
+    ${d.phone ? `<div class="bs-row"><span class="bs-label">WhatsApp</span><span class="bs-value">${d.phone}</span></div>` : ''}
+    <div class="bs-separator"></div>
+    <div class="bs-row"><span class="bs-label">Total</span><span class="bs-value bs-total">${d.price}</span></div>
+    <div class="bs-badge">Pagamento no estúdio</div>
+  `;
+}
+
+// ── Confirm detail ────────────────────────────────────────────
+function buildConfirmDetail() {
+  const d = bookingData;
+  const dateFormatted = new Date(d.date + 'T12:00').toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+  const html = `
+    <div class="sd-row"><span class="sd-icon">💆</span><div class="sd-info"><div class="sd-key">Serviço</div><div class="sd-val">${d.service}</div></div></div>
+    <div class="sd-row"><span class="sd-icon">📅</span><div class="sd-info"><div class="sd-key">Data</div><div class="sd-val">${dateFormatted}</div></div></div>
+    <div class="sd-row"><span class="sd-icon">⏰</span><div class="sd-info"><div class="sd-key">Horário</div><div class="sd-val">${d.time}</div></div></div>
+    <div class="sd-row"><span class="sd-icon">👤</span><div class="sd-info"><div class="sd-key">Nome</div><div class="sd-val">${d.name}</div></div></div>
+    <div class="sd-row"><span class="sd-icon">📱</span><div class="sd-info"><div class="sd-key">WhatsApp</div><div class="sd-val">${d.phone}</div></div></div>
+    <div class="sd-row"><span class="sd-icon">💰</span><div class="sd-info"><div class="sd-key">Valor</div><div class="sd-val">${d.price}</div></div></div>
+    ${d.notes ? `<div class="sd-row"><span class="sd-icon">📝</span><div class="sd-info"><div class="sd-key">Observações</div><div class="sd-val">${d.notes}</div></div></div>` : ''}
+  `;
+  document.getElementById('confirmDetail').innerHTML = html;
+}
+
+// ── Confirm booking → WhatsApp ────────────────────────────────
+function confirmBooking() {
+  const d = bookingData;
+  const dateFormatted = new Date(d.date + 'T12:00').toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  const msg = encodeURIComponent(
+    `Ol\u00e1, Studio Furinhos!\n\nGostaria de confirmar meu agendamento:\n\n` +
+    `\u2022 *Servi\u00e7o:* ${d.service}\n` +
+    `\u2022 *Data:* ${dateFormatted}\n` +
+    `\u2022 *Hor\u00e1rio:* ${d.time}\n` +
+    `\u2022 *Valor da Perfura\u00e7\u00e3o (sem joia):* ${d.price}\n\n` +
+    `\u2022 *Nome:* ${d.name}\n` +
+    `\u2022 *WhatsApp:* ${d.phone}\n` +
+    (d.notes ? `\u2022 *Observa\u00e7\u00f5es:* ${d.notes}\n` : '') +
+    `\nAguardo confirma\u00e7\u00e3o!`
+  );
+
+  // ── Salva automaticamente no painel admin como Pendente ──────
+  const appts = loadAppts();
+  appts.push({
+    id: uid(),
+    date:    d.date,
+    time:    d.time,
+    name:    d.name,
+    phone:   d.phone,
+    service: d.service,
+    price:   d.price,
+    status:  'pending',
+    notes:   d.notes || ''
+  });
+  saveAppts(appts);
+
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+
+  // Show success
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepSuccess').classList.add('active');
+  document.getElementById('successDetail').innerHTML = document.getElementById('confirmDetail').innerHTML;
+
+  // Hide steps indicator
+  document.getElementById('stepsIndicator').style.display = 'none';
+  currentStep = 5;
+}
+
+function resetBooking() {
+  bookingData = { service:'',price:'',duration:'',date:'',time:'',name:'',phone:'',email:'',notes:'' };
+  currentStep = 1;
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('stepsIndicator').style.display = 'flex';
+  resetMultiSelect();
+  document.getElementById('timeSlots').innerHTML = '';
+  document.getElementById('timeTitle').style.display = 'none';
+  updateStepIndicator();
+  updateSummary();
+  renderCalendar();
+}
+
+// ── Contact WhatsApp ──────────────────────────────────────────
+function sendContactWhatsapp(e) {
+  if (e) e.preventDefault();
+  const name    = document.getElementById('contactName').value.trim();
+  const phone   = document.getElementById('contactPhone').value.trim();
+  const subject = document.getElementById('contactSubject').value;
+  const message = document.getElementById('contactMessage').value.trim();
+
+  const text = encodeURIComponent(
+    `Ol\u00e1, Studio Furinhos!\n\n` +
+    (name    ? `*Nome:* ${name}\n`    : '') +
+    (phone   ? `*Tel:* ${phone}\n`   : '') +
+    (subject ? `*Assunto:* ${subject}\n` : '') +
+    (message ? `\n${message}` : '')
+  );
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank');
+  return false;
+}
+
+// ── Phone formatter ───────────────────────────────────────────
+function formatPhone(input) {
+  let v = input.value.replace(/\D/g,'').slice(0,11);
+  if (v.length >= 7) {
+    v = '(' + v.slice(0,2) + ') ' + v.slice(2,7) + '-' + v.slice(7);
+  } else if (v.length >= 3) {
+    v = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  } else if (v.length >= 1) {
+    v = '(' + v;
+  }
+  input.value = v;
+}
+
+// ── Init ──────────────────────────────────────────────────────
+renderCalendar();
+
+// Scroll-based navbar shrink (cosmetic)
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').style.padding = window.scrollY > 40 ? '12px 40px' : '18px 40px';
+});
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ADMIN PANEL — styles + HTML + JS
+════════════════════════════════════════════════════════════════ -->
+<style>
+/* ── Admin overlay (full screen, independent of site) ────────── */
+#adminOverlay {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg); overflow-y: auto;
+  font-family: var(--font-body);
+}
+#adminOverlay.open { display: block; }
+
+/* ── Login screen ─────────────────────────────────────────────── */
+#adminLogin {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; padding: 24px;
+}
+.login-card {
+  background: var(--bg2); border: 1px solid rgba(184,148,90,.3);
+  border-radius: 20px; padding: 52px 48px; width: 100%; max-width: 420px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.login-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.login-logo { font-family: var(--font-head); font-size: 1.6rem; color: var(--gold); margin-bottom:4px; }
+.login-sub  { font-size:.7rem; letter-spacing:.25em; text-transform:uppercase; color:var(--muted); margin-bottom:36px; }
+.login-title { font-family:var(--font-head); font-size:1.3rem; font-weight:300; margin-bottom:8px; }
+.login-desc  { font-size:.82rem; color:var(--muted); margin-bottom:28px; }
+.login-card input {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); padding:14px 18px; border-radius:10px;
+  width:100%; font-size:.95rem; margin-bottom:14px; outline:none;
+  font-family: var(--font-body);
+  transition: border-color .25s;
+}
+.login-card input:focus { border-color: var(--gold); }
+.login-error { color:#e05; font-size:.8rem; margin-bottom:10px; min-height:18px; }
+.login-hint  { font-size:.72rem; color:var(--muted); margin-top:16px; }
+
+/* ── Admin shell ─────────────────────────────────────────────── */
+#adminShell { display:none; min-height:100vh; background:var(--bg); flex-direction:column; }
+#adminShell.open { display:flex; }
+
+/* Topbar */
+.adm-topbar {
+  background:var(--bg2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 32px; position:sticky; top:0; z-index:100;
+  box-shadow:0 1px 8px rgba(0,0,0,.06);
+}
+.adm-topbar-left { display:flex; align-items:center; gap:32px; }
+.adm-topbar-brand { font-family:var(--font-head); font-size:1.1rem; color:var(--gold); white-space:nowrap; }
+.adm-topbar-sub   { font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+
+/* Top tab navigation */
+.adm-tabs { display:flex; gap:4px; }
+.adm-nav-item {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 18px; font-size:.78rem; color:var(--muted);
+  cursor:pointer; border-radius:8px; border:1px solid transparent;
+  transition:all .2s; white-space:nowrap; font-family:var(--font-body);
+}
+.adm-nav-item:hover { color:var(--text); background:var(--bg3); }
+.adm-nav-item.active {
+  color:var(--gold); background:rgba(184,148,90,.1);
+  border-color:rgba(184,148,90,.25); font-weight:500;
+}
+.adm-nav-icon { font-size:.95rem; flex-shrink:0; }
+.adm-topbar-right { display:flex; align-items:center; gap:12px; }
+.adm-user { font-size:.78rem; color:var(--muted); }
+.adm-logout {
+  font-size:.7rem; letter-spacing:.12em; text-transform:uppercase;
+  background:transparent; border:1px solid var(--border);
+  color:var(--muted); padding:6px 16px; border-radius:100px;
+  cursor:pointer; transition:all .2s; font-family:var(--font-body);
+}
+.adm-logout:hover { border-color:var(--gold); color:var(--gold); }
+
+/* Layout — no sidebar */
+.adm-body { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.adm-sidebar { display:none; }
+
+/* Content area */
+.adm-content {
+  flex:1; padding:28px 32px; overflow-y:auto; overflow-x:hidden;
+  background:var(--bg); max-width:1400px; width:100%; margin:0 auto;
+  box-sizing:border-box;
+}
+
+/* ── Stat cards ──────────────────────────────────────────────── */
+.adm-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+.adm-stat-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:14px; padding:22px 20px;
+  transition:border-color .25s, box-shadow .25s;
+}
+.adm-stat-card:hover { border-color:rgba(184,148,90,.3); box-shadow:0 4px 20px rgba(0,0,0,.06); }
+.adm-stat-label { font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.adm-stat-num   { font-family:var(--font-head); font-size:2.2rem; color:var(--gold); line-height:1; }
+.adm-stat-diff  { font-size:.73rem; color:var(--muted); margin-top:6px; }
+
+/* ── Panel sections ──────────────────────────────────────────── */
+.adm-panel { display:none; }
+.adm-panel.active { display:block; animation:fadeIn .25s ease; }
+
+.adm-section-title {
+  font-family:var(--font-head); font-size:1.6rem; font-weight:300;
+  margin-bottom:24px; padding-bottom:14px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+}
+
+/* ── Calendar ─────────────────────────────────────────────────── */
+.adm-cal-wrap { display:grid; grid-template-columns:1fr 320px; gap:20px; }
+.adm-cal-card, .adm-day-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:16px; padding:24px; overflow:hidden;
+}
+.adm-cal-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:18px;
+}
+.adm-cal-title { font-family:var(--font-head); font-size:1.15rem; color:var(--text); }
+.adm-cal-nav-btn {
+  background:var(--bg3); border:1px solid var(--border); color:var(--muted);
+  padding:6px 14px; border-radius:8px; cursor:pointer;
+  transition:all .2s; font-family:var(--font-body); font-size:.82rem;
+}
+.adm-cal-nav-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+.adm-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.adm-cal-header {
+  text-align:center; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); padding:6px 2px; font-weight:500;
+}
+.adm-cal-cell {
+  min-height:56px; padding:6px; border-radius:8px;
+  border:1px solid transparent; cursor:pointer;
+  transition:all .2s; position:relative;
+  background:var(--bg3);
+}
+.adm-cal-cell:hover { border-color:rgba(184,148,90,.4); background:rgba(184,148,90,.06); }
+.adm-cal-cell.today { border-color:var(--gold-dk); background:rgba(184,148,90,.06); }
+.adm-cal-cell.selected { border-color:var(--gold); background:rgba(184,148,90,.12); }
+.adm-cal-cell.other-month { opacity:.3; cursor:default; }
+.adm-cal-cell.other-month:hover { border-color:transparent; background:var(--bg3); }
+.adm-day-num { font-size:.78rem; font-weight:500; margin-bottom:4px; color:var(--text); }
+.adm-cal-cell.today .adm-day-num { color:var(--gold); font-weight:700; }
+.adm-appt-dot {
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:var(--gold); margin:1px;
+}
+.adm-appt-dot.status-confirmed { background:#22c55e; }
+.adm-appt-dot.status-pending   { background:var(--gold); }
+.adm-appt-dot.status-cancelled { background:#ef4444; }
+
+/* Day panel */
+.adm-day-title {
+  font-family:var(--font-head); font-size:1.05rem; margin-bottom:16px;
+  padding-bottom:12px; border-bottom:1px solid var(--border); color:var(--text);
+}
+.adm-day-empty { text-align:center; color:var(--muted); font-size:.84rem; padding:32px 0; }
+.adm-day-card { overflow-y:auto; max-height:600px; }
+
+.adm-appt-item {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:12px; padding:14px 16px; margin-bottom:10px;
+  transition:border-color .2s, box-shadow .2s;
+}
+.adm-appt-item:hover { border-color:rgba(184,148,90,.3); box-shadow:0 2px 12px rgba(0,0,0,.05); }
+.adm-appt-time { font-size:.72rem; letter-spacing:.1em; color:var(--gold); margin-bottom:4px; font-weight:600; }
+.adm-appt-name { font-size:.9rem; font-weight:600; margin-bottom:2px; color:var(--text); }
+.adm-appt-service { font-size:.76rem; color:var(--muted); }
+.adm-appt-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.adm-appt-btn {
+  font-size:.65rem; letter-spacing:.08em; text-transform:uppercase;
+  padding:5px 12px; border-radius:6px; cursor:pointer;
+  font-family:var(--font-body); border:1px solid var(--border);
+  background:var(--bg2); color:var(--muted); transition:all .2s;
+}
+.adm-appt-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(184,148,90,.06); }
+.adm-appt-btn.danger:hover { border-color:#ef4444; color:#ef4444; background:rgba(239,68,68,.05); }
+.adm-status-badge {
+  display:inline-flex; align-items:center;
+  font-size:.62rem; letter-spacing:.1em; text-transform:uppercase;
+  padding:3px 10px; border-radius:100px; margin-top:6px; font-weight:500;
+}
+.adm-status-badge.confirmed { background:rgba(34,197,94,.1); color:#16a34a; border:1px solid rgba(34,197,94,.25); }
+.adm-status-badge.pending   { background:rgba(184,148,90,.1); color:var(--gold-dk); border:1px solid rgba(184,148,90,.3); }
+.adm-status-badge.cancelled { background:rgba(239,68,68,.08); color:#dc2626; border:1px solid rgba(239,68,68,.2); }
+
+/* ── List view ────────────────────────────────────────────────── */
+.adm-filter-bar {
+  display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; align-items:center;
+}
+.adm-filter-bar input, .adm-filter-bar select {
+  background:var(--bg2); border:1px solid var(--border);
+  color:var(--text); padding:10px 14px; border-radius:10px;
+  font-size:.82rem; font-family:var(--font-body); outline:none;
+  transition:border-color .2s;
+}
+.adm-filter-bar input:focus, .adm-filter-bar select:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,148,90,.1); }
+.adm-filter-bar input { flex:1; min-width:200px; }
+
+.adm-table-wrap {
+  overflow-x:auto; border:1px solid var(--border);
+  border-radius:14px; background:var(--bg2);
+}
+.adm-table { width:100%; border-collapse:collapse; font-size:.84rem; }
+.adm-table th {
+  text-align:left; padding:12px 16px;
+  font-size:.63rem; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--muted); border-bottom:1px solid var(--border);
+  white-space:nowrap; background:var(--bg3);
+}
+.adm-table th:first-child { border-radius:14px 0 0 0; }
+.adm-table th:last-child  { border-radius:0 14px 0 0; }
+.adm-table td {
+  padding:14px 16px; border-bottom:1px solid var(--border);
+  vertical-align:middle; color:var(--text);
+}
+.adm-table tr:last-child td { border-bottom:none; }
+.adm-table tr:hover td { background:rgba(184,148,90,.04); }
+.adm-table .td-name { font-weight:600; }
+.adm-table .td-phone a { color:var(--gold); text-decoration:none; }
+.adm-table .td-phone a:hover { text-decoration:underline; }
+.adm-table .td-actions { display:flex; gap:6px; }
+
+/* ── Modal ─────────────────────────────────────────────────────── */
+.adm-modal-bg {
+  display:none; position:fixed; inset:0; z-index:10001;
+  background:rgba(0,0,0,.4); backdrop-filter:blur(8px);
+  align-items:center; justify-content:center; padding:24px;
+}
+.adm-modal-bg.open { display:flex; }
+.adm-modal {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:20px; padding:40px 36px; width:100%; max-width:520px;
+  position:relative; overflow:hidden;
+  animation:modalIn .25s ease;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+@keyframes modalIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.adm-modal::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.adm-modal h3 { font-family:var(--font-head); font-size:1.5rem; font-weight:300; margin-bottom:24px; color:var(--text); }
+.adm-modal .form-group { margin-bottom:16px; }
+.adm-modal .form-label { display:block; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
+.adm-modal input, .adm-modal select, .adm-modal textarea {
+  background:var(--bg3); border:1px solid var(--border); color:var(--text);
+  padding:12px 16px; border-radius:10px; width:100%;
+  font-size:.9rem; font-family:var(--font-body); outline:none;
+  transition:border-color .2s;
+}
+.adm-modal input:focus, .adm-modal select:focus, .adm-modal textarea:focus {
+  border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,148,90,.1);
+}
+.adm-modal .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.adm-modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:28px; }
+.adm-close-modal {
+  position:absolute; top:16px; right:20px; font-size:1.2rem;
+  color:var(--muted); background:none; border:none; cursor:pointer;
+  transition:color .2s; width:32px; height:32px; display:flex;
+  align-items:center; justify-content:center; border-radius:50%;
+}
+.adm-close-modal:hover { color:var(--text); background:var(--bg3); }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.adm-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 24px; border-radius:100px; border:none;
+  font-size:.73rem; letter-spacing:.15em; text-transform:uppercase;
+  font-family:var(--font-body); font-weight:600; cursor:pointer;
+  transition:all .25s;
+}
+.adm-btn-gold  { background:var(--gold); color:#fff; box-shadow:0 2px 12px rgba(184,148,90,.3); }
+.adm-btn-gold:hover { background:var(--gold-lt); transform:translateY(-1px); box-shadow:0 4px 20px rgba(184,148,90,.4); }
+.adm-btn-outline { background:transparent; color:var(--gold); border:1px solid var(--gold-dk); }
+.adm-btn-outline:hover { border-color:var(--gold); background:rgba(184,148,90,.06); }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media(max-width:1024px){
+  .adm-cal-wrap { grid-template-columns:1fr; }
+  .adm-day-card { max-height:none; }
+}
+@media(max-width:768px){
+  .adm-stats { grid-template-columns:repeat(2,1fr); }
+  .adm-modal .form-row { grid-template-columns:1fr; }
+  .adm-content { padding:20px 16px; }
+  .adm-topbar { padding:10px 16px; flex-wrap:wrap; gap:8px; }
+  .adm-topbar-left { flex-wrap:wrap; gap:8px; }
+  .adm-tabs { gap:2px; }
+  .adm-nav-item { padding:6px 12px; font-size:.72rem; }
+  .adm-nav-item span:not(.adm-nav-icon) { display:none; }
+}
+@media(max-width:480px){
+  .adm-stats { grid-template-columns:1fr 1fr; }
+}
+
+/* Admin trigger button — hidden fixed button, now in nav */
+#adminTrigger {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%;
+  background:transparent; border:1px solid rgba(184,148,90,.3);
+  cursor:pointer; transition:all .3s;
+  font-size:.8rem; color:var(--muted);
+  position:static; box-shadow:none;
+  vertical-align:middle;
+}
+#adminTrigger:hover { background:rgba(184,148,90,.1); color:var(--gold); border-color:var(--gold); transform:rotate(45deg); }
+</style>
+
+<!-- Admin panel opened via nav gear icon -->
+
+<!-- ══ ADMIN OVERLAY ════════════════════════════════════════════ -->
+<div id="adminOverlay">
+
+  <!-- LOGIN -->
+  <div id="adminLogin">
+    <div class="login-card">
+      <img src="https://dcdn-us.mitiendanube.com/stores/007/513/945/themes/common/logo-2650926253834101337-1778273875-b5baade564f99aadfa3f5a1820e1041a1778273875-480-0.webp" alt="Studio Furinhos" style="height:56px;width:auto;object-fit:contain;margin-bottom:8px" />
+      <div class="login-sub">Painel Administrativo</div>
+      <div class="login-title">Acesso restrito</div>
+      <p class="login-desc">Digite a senha para entrar no painel.</p>
+      <input type="text" id="adminUser" placeholder="Usuário" autocomplete="off" />
+      <input type="password" id="adminPass" placeholder="Senha" onkeydown="if(event.key==='Enter')doLogin()" />
+      <div class="login-error" id="loginError"></div>
+      <button class="btn btn-gold" style="width:100%" onclick="doLogin()">Entrar</button>
+      <button onclick="closeAdminPanel()" style="background:none;border:none;color:var(--muted);font-size:.8rem;margin-top:14px;cursor:pointer;font-family:var(--font-body)">← Voltar ao site</button>
+      <br>
+      <button onclick="forgotPassword()" style="background:none;border:none;color:var(--gold);font-size:.75rem;margin-top:10px;cursor:pointer;font-family:var(--font-body)">Esqueci a senha</button>
+
+    </div>
+  </div>
+
+  <!-- SHELL -->
+  <div id="adminShell">
+
+    <div class="adm-topbar">
+      <div class="adm-topbar-left">
+        <div>
+          <img src="https://dcdn-us.mitiendanube.com/stores/007/513/945/themes/common/logo-2650926253834101337-1778273875-b5baade564f99aadfa3f5a1820e1041a1778273875-480-0.webp" alt="Studio Furinhos" style="height:32px;width:auto;object-fit:contain;display:block" />
+          <div class="adm-topbar-sub">Painel Admin</div>
+        </div>
+        <div class="adm-tabs">
+          <div class="adm-nav-item active" onclick="showAdmPanel('dashboard')" id="admNav-dashboard">
+            <span class="adm-nav-icon">📊</span> <span>Dashboard</span>
+          </div>
+          <div class="adm-nav-item" onclick="showAdmPanel('calendar')" id="admNav-calendar">
+            <span class="adm-nav-icon">📅</span> <span>Calendário</span>
+          </div>
+          <div class="adm-nav-item" onclick="showAdmPanel('list')" id="admNav-list">
+            <span class="adm-nav-icon">📋</span> <span>Agendamentos</span>
+          </div>
+          <div class="adm-nav-item" onclick="showAdmPanel('settings')" id="admNav-settings">
+            <span class="adm-nav-icon">⚙️</span> <span>Configurações</span>
+          </div>
+        </div>
+      </div>
+      <div class="adm-topbar-right">
+        <span class="adm-user" id="admUserLabel"></span>
+        <button class="adm-logout" onclick="doLogout()">Sair</button>
+      </div>
+    </div>
+
+    <div class="adm-body">
+      <!-- Content -->
+      <main class="adm-content">
+
+        <!-- ── DASHBOARD ── -->
+        <div class="adm-panel active" id="admPanel-dashboard">
+          <div class="adm-section-title">
+            <span>Visão Geral</span>
+            <button class="adm-btn adm-btn-gold" onclick="openNewAppt()">+ Novo Agendamento</button>
+          </div>
+
+          <div class="adm-stats">
+            <div class="adm-stat-card">
+              <div class="adm-stat-label">Hoje</div>
+              <div class="adm-stat-num" id="statToday">0</div>
+              <div class="adm-stat-diff">agendamentos</div>
+            </div>
+            <div class="adm-stat-card">
+              <div class="adm-stat-label">Esta semana</div>
+              <div class="adm-stat-num" id="statWeek">0</div>
+              <div class="adm-stat-diff">agendamentos</div>
+            </div>
+            <div class="adm-stat-card">
+              <div class="adm-stat-label">Este mês</div>
+              <div class="adm-stat-num" id="statMonth">0</div>
+              <div class="adm-stat-diff">agendamentos</div>
+            </div>
+            <div class="adm-stat-card">
+              <div class="adm-stat-label">Total</div>
+              <div class="adm-stat-num" id="statTotal">0</div>
+              <div class="adm-stat-diff">agendamentos</div>
+            </div>
+          </div>
+
+          <!-- Today's list -->
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;">
+            <div style="font-family:var(--font-head);font-size:1.1rem;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+              <span>Agendamentos de Hoje</span>
+              <span id="todayDate" style="font-size:.75rem;color:var(--muted);font-family:var(--font-body)"></span>
+            </div>
+            <div id="dashTodayList"></div>
+          </div>
+        </div>
+
+        <!-- ── CALENDAR ── -->
+        <div class="adm-panel" id="admPanel-calendar">
+          <div class="adm-section-title">
+            <span>Calendário de Agendamentos</span>
+            <button class="adm-btn adm-btn-gold" onclick="openNewAppt()">+ Novo Agendamento</button>
+          </div>
+          <div class="adm-cal-wrap">
+            <div class="adm-cal-card">
+              <div class="adm-cal-nav">
+                <button class="adm-cal-nav-btn" onclick="admCalChange(-1)">‹ Anterior</button>
+                <span class="adm-cal-title" id="admCalTitle"></span>
+                <button class="adm-cal-nav-btn" onclick="admCalChange(1)">Próximo ›</button>
+              </div>
+              <div class="adm-cal-grid" id="admCalGrid">
+                <div class="adm-cal-header">Dom</div>
+                <div class="adm-cal-header">Seg</div>
+                <div class="adm-cal-header">Ter</div>
+                <div class="adm-cal-header">Qua</div>
+                <div class="adm-cal-header">Qui</div>
+                <div class="adm-cal-header">Sex</div>
+                <div class="adm-cal-header">Sáb</div>
+              </div>
+            </div>
+            <div class="adm-day-card">
+              <div class="adm-day-title" id="admDayTitle">Selecione um dia</div>
+              <div id="admDayList"><p class="adm-day-empty">Clique em uma data no calendário para ver os agendamentos.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── LIST ── -->
+        <div class="adm-panel" id="admPanel-list">
+          <div class="adm-section-title">
+            <span>Todos os Agendamentos</span>
+            <button class="adm-btn adm-btn-gold" onclick="openNewAppt()">+ Novo Agendamento</button>
+          </div>
+          <div class="adm-filter-bar">
+            <input type="text" id="searchInput" placeholder="🔍  Buscar por nome, serviço..." oninput="renderListView()" />
+            <select id="filterStatus" onchange="renderListView()">
+              <option value="">Todos os status</option>
+              <option value="pending">Pendente</option>
+              <option value="confirmed">Confirmado</option>
+              <option value="cancelled">Cancelado</option>
+            </select>
+            <select id="filterService" onchange="renderListView()">
+              <option value="">Todos os serviços</option>
+              <option>Piercing de Lóbulo</option>
+              <option>Helix / Cartilagem</option>
+              <option>Tragus / Daith</option>
+              <option>Piercing de Nariz</option>
+              <option>Piercing de Umbigo</option>
+              <option>Troca de Joia</option>
+              <option>Sobrancelha / Labret</option>
+              <option>Retorno / Revisão</option>
+              <option>Consultoria de Curadoria</option>
+            </select>
+          </div>
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead>
+                <tr>
+                  <th>Data / Hora</th>
+                  <th>Cliente</th>
+                  <th>WhatsApp</th>
+                  <th>Serviço</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="apptTableBody"></tbody>
+            </table>
+          </div>
+          <div id="listEmpty" style="display:none;text-align:center;padding:48px;color:var(--muted);font-size:.88rem">
+            Nenhum agendamento encontrado.
+          </div>
+        </div>
+
+        <!-- ── SETTINGS ── -->
+        <div class="adm-panel" id="admPanel-settings">
+          <div class="adm-section-title"><span>Configurações</span></div>
+
+          <div style="max-width:480px">
+            <!-- Change password -->
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:24px;position:relative;overflow:hidden">
+              <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>
+              <div style="font-family:var(--font-head);font-size:1.2rem;margin-bottom:6px">🔐 Alterar Senha</div>
+              <p style="font-size:.82rem;color:var(--muted);margin-bottom:24px">A nova senha será salva e usada no próximo login.</p>
+
+              <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label">Senha atual</label>
+                <input type="password" id="cfgCurrentPass" placeholder="Digite a senha atual" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px;width:100%;font-family:var(--font-body);font-size:.9rem;outline:none" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" />
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label">Nova senha</label>
+                <input type="password" id="cfgNewPass" placeholder="Mínimo 6 caracteres" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px;width:100%;font-family:var(--font-body);font-size:.9rem;outline:none" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" />
+              </div>
+              <div class="form-group" style="margin-bottom:20px">
+                <label class="form-label">Confirmar nova senha</label>
+                <input type="password" id="cfgConfirmPass" placeholder="Repita a nova senha" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px;width:100%;font-family:var(--font-body);font-size:.9rem;outline:none" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" />
+              </div>
+
+              <div id="cfgMsg" style="font-size:.82rem;min-height:20px;margin-bottom:14px"></div>
+
+              <button class="adm-btn adm-btn-gold" onclick="changeAdmPassword()">Salvar nova senha</button>
+            </div>
+
+            <!-- Current credentials info -->
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px">
+              <div style="font-family:var(--font-head);font-size:1.1rem;margin-bottom:16px">👤 Acesso atual</div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:.87rem">
+                <span style="color:var(--muted)">Usuário</span>
+                <span id="cfgUserDisplay" style="color:var(--gold)">admin</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:.87rem">
+                <span style="color:var(--muted)">Senha</span>
+                <span style="color:var(--muted)">••••••••</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADD / EDIT MODAL ═════════════════════════════════════════ -->
+<div class="adm-modal-bg" id="apptModal">
+  <div class="adm-modal">
+    <button class="adm-close-modal" onclick="closeModal()">✕</button>
+    <h3 id="modalTitle">Novo Agendamento</h3>
+    <input type="hidden" id="modalId" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data *</label>
+        <input type="date" id="mDate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Horário *</label>
+        <input type="time" id="mTime" step="1800" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nome do cliente *</label>
+      <input type="text" id="mName" placeholder="Nome completo" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">WhatsApp</label>
+      <input type="tel" id="mPhone" placeholder="(15) 99999-9999" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Serviço *</label>
+      <select id="mService">
+        <option value="">Selecione...</option>
+        <optgroup label="── Promocional (com joia)">
+          <option data-price="R$ 90,00">Promocional — Lóbulo</option>
+          <option data-price="R$ 90,00">Promocional — Hélix</option>
+          <option data-price="R$ 90,00">Promocional — Flat</option>
+          <option data-price="R$ 90,00">Promocional — Trágus</option>
+          <option data-price="R$ 90,00">Promocional — Anti Hélix</option>
+          <option data-price="R$ 90,00">Promocional — Minions</option>
+        </optgroup>
+        <optgroup label="── Perfurações R$ 50,00">
+          <option data-price="R$ 50,00">Lóbulo</option>
+          <option data-price="R$ 50,00">Hélix</option>
+          <option data-price="R$ 50,00">Anti Hélix</option>
+          <option data-price="R$ 50,00">Flat</option>
+          <option data-price="R$ 50,00">Trágus</option>
+          <option data-price="R$ 50,00">Rook</option>
+          <option data-price="R$ 50,00">Minions</option>
+          <option data-price="R$ 50,00">Nariz</option>
+          <option data-price="R$ 50,00">Umbigo</option>
+        </optgroup>
+        <optgroup label="── Especiais">
+          <option data-price="R$ 180,00">Daith</option>
+          <option data-price="R$ 250,00">Australianos</option>
+        </optgroup>
+        <optgroup label="── Outros">
+          <option data-price="R$ 60,00">Laserterapia</option>
+          <option data-price="R$ 60,00">Limpeza de Joias</option>
+          <option data-price="R$ 40,00">Atualização de Joia</option>
+          <option data-price="Gratuito">Retorno / Revisão</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Valor</label>
+        <input type="text" id="mPrice" placeholder="R$ 0" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select id="mStatus">
+          <option value="pending">Pendente</option>
+          <option value="confirmed">Confirmado</option>
+          <option value="cancelled">Cancelado</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observações</label>
+      <textarea id="mNotes" rows="2" placeholder="Notas internas..."></textarea>
+    </div>
+    <div class="adm-modal-footer">
+      <button class="adm-btn adm-btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="adm-btn adm-btn-gold" onclick="saveAppt()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  ADMIN PANEL — JavaScript
+// ════════════════════════════════════════════════════════════════
+
+// ── Credentials — load from localStorage if saved ──────────────
+let currentAdmUser = localStorage.getItem('sf_adm_user') || 'admin';
+let currentAdmPass = localStorage.getItem('sf_adm_pass') || 'furinhos2025';
+
+// ── Forgot password — abre Gmail com link de redefinição ───────
+function forgotPassword() {
+  const resetUrl = window.location.origin + window.location.pathname + '?resetadmin=' + btoa('furinhos_reset_2025');
+  const subject  = encodeURIComponent('Redefinir senha — Painel Studio Furinhos');
+  const body     = encodeURIComponent(
+    'Clique no link abaixo para redefinir a senha:\n\n' + resetUrl
+  );
+  const gmailUrl = 'https://mail.google.com/mail/?view=cm&to=studiofurinhos@gmail.com&su=' + subject + '&body=' + body;
+  window.open(gmailUrl, '_blank');
+  // Mostra também o link na tela para copiar
+  document.getElementById('loginError').style.color = 'var(--gold)';
+  document.getElementById('loginError').innerHTML =
+    '✅ Abrindo Gmail...<br><small style="font-size:.7rem;word-break:break-all;color:var(--muted)">Ou copie o link: <a href="' + resetUrl + '" style="color:var(--gold)">' + resetUrl + '</a></small>';
+}
+
+// ── Verifica parâmetro de reset na URL ─────────────────────────
+(function checkResetParam() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const token  = params.get('resetadmin');
+    if (token && atob(token) === 'furinhos_reset_2025') {
+      localStorage.removeItem('sf_adm_pass');
+      localStorage.removeItem('sf_adm_user');
+      currentAdmUser = 'admin';
+      currentAdmPass = 'furinhos2025';
+      // Remove param da URL sem recarregar
+      window.history.replaceState({}, '', window.location.pathname);
+      setTimeout(() => {
+        alert('✅ Senha redefinida com sucesso!\n\nUse: admin / furinhos2025\n\nApós entrar, vá em Configurações para criar uma nova senha.');
+        openAdminPanel();
+      }, 500);
+    }
+  } catch(e) {}
+})();
+
+function doLogin() {
+  const u = document.getElementById('adminUser').value.trim();
+  const p = document.getElementById('adminPass').value;
+  if (u === currentAdmUser && p === currentAdmPass) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminShell').classList.add('open');
+    document.getElementById('admUserLabel').textContent = '👤 ' + u;
+    document.getElementById('cfgUserDisplay').textContent = u;
+    seedDemoData();
+    refreshAll();
+  } else {
+    document.getElementById('loginError').textContent = 'Usuário ou senha incorretos.';
+    document.getElementById('adminPass').value = '';
+  }
+}
+
+function changeAdmPassword() {
+  const current  = document.getElementById('cfgCurrentPass').value;
+  const newPass  = document.getElementById('cfgNewPass').value;
+  const confirm  = document.getElementById('cfgConfirmPass').value;
+  const msg      = document.getElementById('cfgMsg');
+
+  if (current !== currentAdmPass) {
+    msg.style.color = '#f87171';
+    msg.textContent = '✕ Senha atual incorreta.';
+    return;
+  }
+  if (newPass.length < 6) {
+    msg.style.color = '#f87171';
+    msg.textContent = '✕ A nova senha precisa ter pelo menos 6 caracteres.';
+    return;
+  }
+  if (newPass !== confirm) {
+    msg.style.color = '#f87171';
+    msg.textContent = '✕ As senhas não coincidem.';
+    return;
+  }
+
+  currentAdmPass = newPass;
+  localStorage.setItem('sf_adm_pass', newPass);
+  document.getElementById('cfgCurrentPass').value = '';
+  document.getElementById('cfgNewPass').value = '';
+  document.getElementById('cfgConfirmPass').value = '';
+  msg.style.color = '#4ade80';
+  msg.textContent = '✓ Senha alterada com sucesso!';
+  setTimeout(() => msg.textContent = '', 4000);
+}
+function loadAppts() {
+  try { return JSON.parse(localStorage.getItem('sf_appointments') || '[]'); }
+  catch(e) { return []; }
+}
+function saveAppts(arr) {
+  localStorage.setItem('sf_appointments', JSON.stringify(arr));
+}
+
+// Pre-load some demo appointments so the panel isn't empty
+function seedDemoData() {
+  if (localStorage.getItem('sf_seeded')) return;
+  const today = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  const addDays = n => { const d = new Date(today); d.setDate(d.getDate()+n); return fmt(d); };
+  const demos = [
+    { id: uid(), name:'Ana Luiza', phone:'(15) 99111-2222', service:'Helix / Cartilagem', price:'R$ 90', date: fmt(today), time:'09:30', status:'confirmed', notes:'' },
+    { id: uid(), name:'Camila Rodrigues', phone:'(15) 99333-4444', service:'Tragus / Daith', price:'R$ 100', date: fmt(today), time:'11:00', status:'pending', notes:'Primeira vez' },
+    { id: uid(), name:'Fernanda Melo', phone:'(15) 99555-6666', service:'Piercing de Umbigo', price:'R$ 110', date: addDays(1), time:'14:00', status:'confirmed', notes:'' },
+    { id: uid(), name:'Julia Santos', phone:'(15) 99777-8888', service:'Piercing de Nariz', price:'R$ 90', date: addDays(2), time:'10:00', status:'pending', notes:'' },
+    { id: uid(), name:'Mariana Costa', phone:'(15) 99888-0000', service:'Troca de Joia', price:'R$ 40', date: addDays(3), time:'15:30', status:'confirmed', notes:'' },
+  ];
+  saveAppts(demos);
+  localStorage.setItem('sf_seeded', '1');
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ── Open / Close admin panel ───────────────────────────────────
+function openAdminPanel() {
+  document.getElementById('adminOverlay').classList.add('open');
+  document.getElementById('adminLogin').style.display = 'flex';
+  document.getElementById('adminShell').classList.remove('open');
+  document.getElementById('adminPass').value = '';
+  document.getElementById('adminUser').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+function closeAdminPanel() {
+  document.getElementById('adminOverlay').classList.remove('open');
+}
+
+// ── Login ──────────────────────────────────────────────────────
+function doLogout() {
+  document.getElementById('adminShell').classList.remove('open');
+  document.getElementById('adminLogin').style.display = 'flex';
+}
+
+// ── Panel navigation ───────────────────────────────────────────
+let admCalDate = new Date();
+let selectedAdmDate = null;
+
+function showAdmPanel(name) {
+  document.querySelectorAll('.adm-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('admPanel-' + name).classList.add('active');
+  document.querySelectorAll('.adm-nav-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('admNav-' + name).classList.add('active');
+  if (name === 'calendar') { renderAdmCalendar(); }
+  if (name === 'list')     { renderListView(); }
+  if (name === 'dashboard') { renderDashboard(); }
+}
+
+// ── Refresh all ────────────────────────────────────────────────
+function refreshAll() {
+  renderDashboard();
+  renderAdmCalendar();
+  renderListView();
+}
+
+// ── Dashboard ──────────────────────────────────────────────────
+function renderDashboard() {
+  const appts = loadAppts();
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().split('T')[0];
+
+  const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - today.getDay());
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  const todayA  = appts.filter(a => a.date === todayStr && a.status !== 'cancelled');
+  const weekA   = appts.filter(a => { const d = new Date(a.date+'T12:00'); return d >= startOfWeek && d <= new Date(today.getTime()+6*864e5) && a.status !== 'cancelled'; });
+  const monthA  = appts.filter(a => { const d = new Date(a.date+'T12:00'); return d >= startOfMonth && a.status !== 'cancelled'; });
+
+  document.getElementById('statToday').textContent  = todayA.length;
+  document.getElementById('statWeek').textContent   = weekA.length;
+  document.getElementById('statMonth').textContent  = monthA.length;
+  document.getElementById('statTotal').textContent  = appts.filter(a=>a.status!=='cancelled').length;
+  document.getElementById('todayDate').textContent  = today.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+
+  const list = document.getElementById('dashTodayList');
+  if (!todayA.length) {
+    list.innerHTML = '<p class="adm-day-empty">Nenhum agendamento para hoje.</p>';
+    return;
+  }
+  todayA.sort((a,b)=>a.time.localeCompare(b.time));
+  list.innerHTML = todayA.map(a => apptItemHTML(a)).join('');
+}
+
+// ── Admin Calendar ─────────────────────────────────────────────
+const ADM_MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function renderAdmCalendar() {
+  const appts = loadAppts();
+  const year  = admCalDate.getFullYear();
+  const month = admCalDate.getMonth();
+  document.getElementById('admCalTitle').textContent = ADM_MONTHS[month] + ' ' + year;
+
+  const grid = document.getElementById('admCalGrid');
+  const cells = Array.from(grid.children).slice(7);
+  cells.forEach(c => c.remove());
+
+  const firstDay   = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const prevDays   = new Date(year, month, 0).getDate();
+  const todayStr   = new Date().toISOString().split('T')[0];
+
+  // Previous month cells
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const cell = document.createElement('div');
+    cell.className = 'adm-cal-cell other-month';
+    cell.innerHTML = `<div class="adm-day-num" style="color:var(--muted)">${prevDays - i}</div>`;
+    grid.appendChild(cell);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const dayAppts = appts.filter(a => a.date === dateStr);
+    const cell = document.createElement('div');
+    cell.className = 'adm-cal-cell' + (dateStr === todayStr ? ' today' : '') + (selectedAdmDate === dateStr ? ' selected' : '');
+    const dots = dayAppts.map(a => `<span class="adm-appt-dot status-${a.status}"></span>`).join('');
+    cell.innerHTML = `<div class="adm-day-num">${d}</div><div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:2px">${dots}</div>`;
+    cell.onclick = () => selectAdmDate(dateStr, d);
+    grid.appendChild(cell);
+  }
+
+  // Fill remaining cells
+  const total = firstDay + daysInMonth;
+  const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let d = 1; d <= remaining; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'adm-cal-cell other-month';
+    cell.innerHTML = `<div class="adm-day-num" style="color:var(--muted)">${d}</div>`;
+    grid.appendChild(cell);
+  }
+}
+
+function selectAdmDate(dateStr, d) {
+  selectedAdmDate = dateStr;
+  renderAdmCalendar();
+  const appts = loadAppts().filter(a => a.date === dateStr);
+  appts.sort((a,b)=>a.time.localeCompare(b.time));
+  const date = new Date(dateStr + 'T12:00');
+  document.getElementById('admDayTitle').textContent =
+    date.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  const list = document.getElementById('admDayList');
+  list.innerHTML = appts.length
+    ? appts.map(a => apptItemHTML(a)).join('')
+    : '<p class="adm-day-empty">Nenhum agendamento neste dia.</p>';
+}
+
+function admCalChange(delta) {
+  admCalDate.setMonth(admCalDate.getMonth() + delta);
+  selectedAdmDate = null;
+  document.getElementById('admDayTitle').textContent = 'Selecione um dia';
+  document.getElementById('admDayList').innerHTML = '<p class="adm-day-empty">Clique em uma data no calendário para ver os agendamentos.</p>';
+  renderAdmCalendar();
+}
+
+// ── List view ──────────────────────────────────────────────────
+function renderListView() {
+  const appts  = loadAppts();
+  const search = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  const status = document.getElementById('filterStatus')?.value||'';
+  const svc    = document.getElementById('filterService')?.value||'';
+
+  const filtered = appts.filter(a => {
+    const matchSearch = !search || a.name.toLowerCase().includes(search) || a.service.toLowerCase().includes(search) || (a.phone||'').includes(search);
+    const matchStatus = !status || a.status === status;
+    const matchSvc    = !svc    || a.service === svc;
+    return matchSearch && matchStatus && matchSvc;
+  }).sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+
+  const body = document.getElementById('apptTableBody');
+  const empty = document.getElementById('listEmpty');
+
+  if (!filtered.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = filtered.map(a => {
+    const date = new Date(a.date+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const statusLabel = { pending:'Pendente', confirmed:'Confirmado', cancelled:'Cancelado' }[a.status]||a.status;
+    const waLink = a.phone ? `<a href="https://wa.me/55${a.phone.replace(/\D/g,'')}" target="_blank">${a.phone}</a>` : '—';
+    return `<tr>
+      <td><strong>${date}</strong><br><span style="color:var(--muted);font-size:.78rem">${a.time}</span></td>
+      <td class="td-name">${a.name}</td>
+      <td class="td-phone">${waLink}</td>
+      <td>${a.service}</td>
+      <td style="color:var(--gold)">${a.price||'—'}</td>
+      <td><span class="adm-status-badge ${a.status}">${statusLabel}</span></td>
+      <td><div class="td-actions">
+        <button class="adm-appt-btn" onclick="editAppt('${a.id}')">✏ Editar</button>
+        <button class="adm-appt-btn" style="color:#16a34a;border-color:rgba(34,197,94,.3)" onclick="setStatus('${a.id}','confirmed')">✓ Confirmar</button>
+        <button class="adm-appt-btn danger" onclick="setStatus('${a.id}','cancelled')">✕ Cancelar</button>
+        <button class="adm-appt-btn danger" onclick="deleteAppt('${a.id}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Appointment item HTML (used in calendar + dashboard) ───────
+function apptItemHTML(a) {
+  const statusLabel = { pending:'Pendente', confirmed:'Confirmado', cancelled:'Cancelado' }[a.status]||a.status;
+  const waNum = (a.phone||'').replace(/\D/g,'');
+  const waLink = waNum ? `onclick="window.open('https://wa.me/55${waNum}')"` : '';
+  return `<div class="adm-appt-item">
+    <div class="adm-appt-time">⏰ ${a.time}</div>
+    <div class="adm-appt-name">${a.name}</div>
+    <div class="adm-appt-service">${a.service} · ${a.price||''}</div>
+    ${a.phone ? `<div style="font-size:.75rem;color:var(--muted);margin-top:4px">📱 ${a.phone}</div>` : ''}
+    <span class="adm-status-badge ${a.status}">${statusLabel}</span>
+    <div class="adm-appt-actions" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="adm-appt-btn" onclick="editAppt('${a.id}')">✏ Editar</button>
+      ${a.phone ? `<button class="adm-appt-btn" ${waLink}>💬 WhatsApp</button>` : ''}
+      <button class="adm-appt-btn" style="color:#16a34a;border-color:rgba(34,197,94,.3)" onclick="setStatus('${a.id}','confirmed')">✓ Confirmar</button>
+      <button class="adm-appt-btn danger" onclick="setStatus('${a.id}','cancelled')">✕ Cancelar</button>
+      <button class="adm-appt-btn danger" onclick="deleteAppt('${a.id}')">🗑 Excluir</button>
+    </div>
+    ${a.notes ? `<div style="font-size:.75rem;color:var(--muted);margin-top:6px;font-style:italic">📝 ${a.notes}</div>` : ''}
+  </div>`;
+}
+
+// ── Modal ──────────────────────────────────────────────────────
+function openNewAppt() {
+  document.getElementById('modalTitle').textContent = 'Novo Agendamento';
+  document.getElementById('modalId').value = '';
+  document.getElementById('mDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('mTime').value = '09:30';
+  document.getElementById('mName').value = '';
+  document.getElementById('mPhone').value = '';
+  document.getElementById('mService').value = '';
+  document.getElementById('mPrice').value = '';
+  document.getElementById('mStatus').value = 'pending';
+  document.getElementById('mNotes').value = '';
+  document.getElementById('apptModal').classList.add('open');
+}
+
+function editAppt(id) {
+  const a = loadAppts().find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('modalTitle').textContent = 'Editar Agendamento';
+  document.getElementById('modalId').value  = a.id;
+  document.getElementById('mDate').value    = a.date;
+  document.getElementById('mTime').value    = a.time;
+  document.getElementById('mName').value    = a.name;
+  document.getElementById('mPhone').value   = a.phone||'';
+  document.getElementById('mService').value = a.service;
+  document.getElementById('mPrice').value   = a.price||'';
+  document.getElementById('mStatus').value  = a.status;
+  document.getElementById('mNotes').value   = a.notes||'';
+  document.getElementById('apptModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('apptModal').classList.remove('open');
+}
+
+function saveAppt() {
+  const id      = document.getElementById('modalId').value;
+  const date    = document.getElementById('mDate').value;
+  const time    = document.getElementById('mTime').value;
+  const name    = document.getElementById('mName').value.trim();
+  const phone   = document.getElementById('mPhone').value.trim();
+  const service = document.getElementById('mService').value;
+  const price   = document.getElementById('mPrice').value.trim();
+  const status  = document.getElementById('mStatus').value;
+  const notes   = document.getElementById('mNotes').value.trim();
+
+  if (!date || !time || !name || !service) {
+    alert('Preencha os campos obrigatórios: data, horário, nome e serviço.');
+    return;
+  }
+
+  // Auto-fill price from service option if empty
+  let finalPrice = price;
+  if (!finalPrice) {
+    const opt = document.querySelector(`#mService option[value="${service}"]`) ||
+                Array.from(document.querySelectorAll('#mService option')).find(o=>o.value===service);
+    if (opt) finalPrice = opt.dataset.price || '';
+  }
+
+  const appts = loadAppts();
+  if (id) {
+    const idx = appts.findIndex(a => a.id === id);
+    if (idx >= 0) appts[idx] = { id, date, time, name, phone, service, price:finalPrice, status, notes };
+  } else {
+    appts.push({ id:uid(), date, time, name, phone, service, price:finalPrice, status, notes });
+  }
+  saveAppts(appts);
+  closeModal();
+  refreshAll();
+  // Refresh day view if same date selected
+  if (selectedAdmDate === date) selectAdmDate(date, parseInt(date.split('-')[2]));
+}
+
+function deleteAppt(id) {
+  if (!confirm('Excluir este agendamento?')) return;
+  const appts = loadAppts().filter(a => a.id !== id);
+  saveAppts(appts);
+  refreshAll();
+  if (selectedAdmDate) selectAdmDate(selectedAdmDate, parseInt(selectedAdmDate.split('-')[2]));
+}
+
+function setStatus(id, newStatus) {
+  const appts = loadAppts();
+  const a = appts.find(x => x.id === id);
+  if (!a) return;
+
+  if (newStatus === 'cancelled') {
+    if (!confirm(`Cancelar o agendamento de ${a.name}?`)) return;
+  }
+
+  a.status = newStatus;
+  saveAppts(appts);
+  refreshAll();
+  if (selectedAdmDate) selectAdmDate(selectedAdmDate, parseInt(selectedAdmDate.split('-')[2]));
+
+  // Se confirmado, envia msg de confirmação pro cliente via WhatsApp
+  if (newStatus === 'confirmed' && a.phone) {
+    const waNum = a.phone.replace(/\D/g,'');
+    const date  = new Date(a.date + 'T12:00').toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+    const msg   = encodeURIComponent(
+      `Ol\u00e1, ${a.name}!\n\n` +
+      `Seu agendamento no *Studio Furinhos* est\u00e1 *confirmado*!\n\n` +
+      `\u2022 *Servi\u00e7o:* ${a.service}\n` +
+      `\u2022 *Data:* ${date}\n` +
+      `\u2022 *Hor\u00e1rio:* ${a.time}\n` +
+      `\u2022 *Valor da Perfura\u00e7\u00e3o (sem joia):* ${a.price}\n\n` +
+      `Em caso de d\u00favidas ou necessidade de reagendamento, entre em contato.\n\n` +
+      `Te esperamos!`
+    );
+    window.open(`https://wa.me/55${waNum}?text=${msg}`, '_blank');
+  }
+
+  if (newStatus === 'cancelled' && a.phone) {
+    const waNum = a.phone.replace(/\D/g,'');
+    const msg   = encodeURIComponent(
+      `Ol\u00e1, ${a.name}!\n\n` +
+      `Seu agendamento no *Studio Furinhos* foi *cancelado*.\n\n` +
+      `Se quiser reagendar, estamos \u00e0 disposi\u00e7\u00e3o!`
+    );
+    window.open(`https://wa.me/55${waNum}?text=${msg}`, '_blank');
+  }
+}
+
+// Close modal on backdrop click
+try {
+  document.getElementById('apptModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('mService').addEventListener('change', function() {
+    const opt = this.options[this.selectedIndex];
+    if (opt && opt.dataset.price) document.getElementById('mPrice').value = opt.dataset.price;
+  });
+} catch(e) {}
+
+// Admin acessado pelo ícone de engrenagem no menu
+</script>
+
+</body>
+</html>
