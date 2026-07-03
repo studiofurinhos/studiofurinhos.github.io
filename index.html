@@ -718,7 +718,16 @@ function Dash({stats,svcs,ps,cls,desp,setDesp,colabs,setColabs,canFinancials,can
     ),
 
     React.createElement("div",{className:"kg"},[["Faturamento",R(filtStats.f),"b"],["Despesa Mensal",R(totalD),"_desp"],["Custo",R(filtStats.c),""],["Comiss\u00F5es",R(totalComissoes),""],["Lucro real",R(lucroReal),lucroReal>=0?"g":"r"],["Margem",P(margem),margem>=0?"g":"r"],["Atendimentos",""+svcsFil.length,""],["Clientes",""+cls.length,""]].map(function(item){var l=item[0],v=item[1],c=item[2];var isD=c==="_desp";return React.createElement("div",{className:"kpi",key:l,onClick:isD?function(){setDespModal(true);}:undefined,style:isD?{cursor:"pointer",outline:".5px solid var(--border2)",borderRadius:"var(--radius)"}:{}},React.createElement("div",{className:"kl"},l+(isD?" \u{1F4CB}":"")),React.createElement("div",{className:"kv "+(isD?"":c||"")},v));})),
-    fpe.length>0&&React.createElement("div",{className:"kg",style:{marginTop:-6}},fpe.map(([k,v])=>{const f=FPM[k];const isEsc=k==="escambo";return React.createElement("div",{key:k,className:"kpi",onClick:isEsc?()=>setEscamboModal(true):undefined,style:isEsc?{cursor:"pointer",outline:".5px solid var(--border)",borderRadius:"var(--radius)"}:{}},React.createElement("div",{className:"kl"},(f?.ico||"")+" "+(f?.label||k)+(isEsc?" \u{1F4CB}":"")),React.createElement("div",{className:"kv"},R(v)));
+    React.createElement("div",{className:"kg",style:{marginTop:-6}},FP.map(function(f){
+      var total=filtStats.fm&&filtStats.fm[f.id]?filtStats.fm[f.id]:0;
+      var isEsc=f.id==="escambo";
+      return React.createElement("div",{key:f.id,className:"kpi",
+        onClick:isEsc&&total>0?function(){setEscamboModal(true);}:undefined,
+        style:isEsc&&total>0?{cursor:"pointer",outline:".5px solid var(--border2)",borderRadius:"var(--radius)"}:{}
+      },
+        React.createElement("div",{className:"kl"},f.ico+" "+f.label+(isEsc&&total>0?" \uD83D\uDCCB":"")),
+        React.createElement("div",{className:"kv",style:{color:total>0?"var(--text)":"var(--text2)",fontSize:total>0?undefined:"14px"}},R(total))
+      );
     })),
 
     /* Despesas fixas */
