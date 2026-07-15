@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="color-scheme" content="dark"/>
+<meta name="theme-color" content="#1c1c1a"/>
+<title>Controle de Custo e Lucro</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f5f5f4;--bg3:#f0efeb;--text:#1a1a1a;--text2:#6b6b6b;--border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);--radius:8px;--rlg:12px;--green:#3B6D11;--gbg:#EAF3DE;--gdark:#27500A;--abg:#FAEEDA;--amber:#854F0B;--rbg:#FCEBEB;--red:#A32D2D;--blue:#185FA5;--bbg:#E8F0FB;--pix:#32BCAD;--pixbg:#E6F8F6}
+:root{--bg:#1c1c1a;--bg2:#252522;--bg3:#2c2c29;--text:#e8e8e5;--text2:#a0a09a;--border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);--green:#97C459;--gbg:#173404;--gdark:#C0DD97;--abg:#412402;--amber:#FAC775;--rbg:#501313;--red:#F09595;--blue:#85B7EB;--bbg:#0D1F3C;--pix:#32BCAD;--pixbg:#0A2A27;--radius:6px;--rlg:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg3);min-height:100vh}
+#app{width:100%;padding:0}
+.hdr{display:none}
+.hdr h1{display:none}
+.hdr p{display:none}
+.app-layout{display:flex;min-height:100vh;gap:0}
+.sidebar{width:200px;min-width:160px;background:var(--bg);border-right:.5px solid var(--border);display:flex;flex-direction:column;padding:10px 0;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0;z-index:100}
+.sidebar-logo{padding:14px 16px 10px;border-bottom:.5px solid var(--border);margin-bottom:6px}
+.sidebar-logo h1{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.sidebar-logo p{font-size:10px;color:var(--text2);margin-top:2px}
+.main-content{flex:1;min-width:0;padding:16px 18px}
+.mob-header{display:none}
+.sidebar-overlay{display:none}
+@media(max-width:700px){
+  .app-layout{flex-direction:column}
+  .sidebar{display:none;position:fixed;left:0;top:0;height:100vh;z-index:200;box-shadow:4px 0 24px rgba(0,0,0,.5)}
+  .sidebar.open{display:flex}
+  .sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199}
+  .main-content{padding:12px 12px 80px}
+  .mob-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-bottom:.5px solid var(--border);position:sticky;top:0;z-index:100}
+  .mob-title{font-size:14px;font-weight:700;color:var(--text)}
+  .mob-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:2px 6px;line-height:1}
+}
+.tabs{display:flex;flex-direction:column;gap:1px;padding:0 6px}
+.tab{padding:9px 10px;cursor:pointer;border:none;background:none;font-size:12.5px;color:var(--text2);border-radius:var(--radius);text-align:left;width:100%;display:flex;align-items:center;gap:6px;border-left:3px solid transparent}
+.tab.on{color:var(--text);background:var(--bg2);font-weight:600;border-left-color:var(--green)}
+.tab:hover:not(.on){background:var(--bg2);color:var(--text)}
+.tab-row{display:flex;align-items:center;gap:2px;margin:1px 6px}
+.tab-arrows{display:flex;flex-direction:column;gap:0;opacity:0;transition:opacity .15s}
+.tab-row:hover .tab-arrows{opacity:.6}
+.kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:14px}
+.kpi{background:var(--bg2);border-radius:var(--radius);padding:10px 10px;text-align:center}
+.kl{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.kv{font-size:16px;font-weight:700}.kv.g{color:var(--green)}.kv.r{color:var(--red)}.kv.b{color:var(--blue)}
+.card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rlg);padding:16px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;border-bottom:.5px solid var(--border2);font-weight:600;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+td{padding:7px 10px;border-bottom:.5px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+.bx{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.ok{background:var(--gbg);color:var(--green)}.lw{background:var(--abg);color:var(--amber)}.no{background:var(--rbg);color:var(--red)}
+.pixbx{background:var(--pixbg);color:var(--pix)}.bbx{background:var(--bbg);color:var(--blue)}.cbx{background:var(--abg);color:var(--amber)}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:12px;color:var(--text2);font-weight:600}
+.fg input,.fg select,.fg textarea{padding:8px 10px;border:.5px solid var(--border2);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text);width:100%;font-family:inherit}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:2px solid var(--green);outline-offset:1px}
+.fgrid{display:grid;gap:12px;margin-bottom:14px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:2fr 1fr 1fr 1fr}
+.sr{display:grid;grid-template-columns:1fr 72px 88px 30px;gap:8px;align-items:center;margin-bottom:8px}
+.btn{padding:8px 15px;border:.5px solid var(--border2);border-radius:var(--radius);cursor:pointer;font-size:13px;background:var(--bg);color:var(--text);transition:background .15s}
+.btn:hover{background:var(--bg2)}
+.bp{background:var(--green);color:#fff;border-color:var(--green)}.bp:hover{background:var(--gdark)}
+.bwa{background:#25D366;color:#fff;border:.5px solid #25D366;text-decoration:none;display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--radius);font-size:12px;font-weight:700;cursor:pointer}
+.bwa:hover{background:#128C7E}
+.bs{padding:5px 10px;font-size:12px}.bd{color:var(--red);border-color:var(--border)}
+.stl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.cbox{background:var(--bg2);border-radius:var(--radius);padding:13px;margin-bottom:14px}
+.cr{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.cr.tot{font-weight:700;border-top:.5px solid var(--border2);margin-top:6px;padding-top:8px}
+.hcard{border:.5px solid var(--border);border-radius:var(--rlg);padding:14px 16px;margin-bottom:10px;background:var(--bg);transition:border-color .25s}
+.hcard.paid{border-color:rgba(59,109,17,.35)}
+.hh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.mbar{height:5px;border-radius:3px;background:var(--border);overflow:hidden;margin-bottom:10px}
+.mfill{height:100%;border-radius:3px}
+.empty{text-align:center;padding:48px;color:var(--text2);font-size:13px}
+.td-i{padding:5px 7px;border:.5px solid var(--border2);border-radius:6px;font-size:12px;background:var(--bg);color:var(--text)}
+.pp{border:.5px solid var(--border2);border-radius:var(--radius);padding:14px;margin-bottom:10px;background:var(--bg2)}
+.pms{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px}
+.pmb{padding:8px 2px;border:.5px solid var(--border2);border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600;text-align:center;background:var(--bg);color:var(--text);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.pmb:hover{border-color:var(--green);background:var(--gbg);color:var(--green)}
+.pmb.sel{border-color:var(--green);background:var(--gbg);color:var(--green)}
+.pmico{font-size:18px}
+.acts{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.scr{overflow-x:auto}
+/* Config / mensagem */
+.wa-sim{background:#E7FFDB;border-radius:12px;padding:14px 16px;font-size:13px;color:#1a3a11;white-space:pre-wrap;line-height:1.65;border:.5px solid rgba(37,211,102,.25);min-height:80px}
+.var-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{padding:4px 10px;border:.5px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;background:var(--bg);font-family:monospace;color:var(--blue)}
+.chip:hover{background:var(--bbg);border-color:var(--blue)}
+.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:720px){.cfg-grid{grid-template-columns:1fr}}
+.alert-ok{background:var(--gbg);color:var(--green);border-radius:var(--radius);padding:8px 12px;font-size:12px;font-weight:600;display:inline-block;margin-top:8px}
+.msg-sent{background:var(--gbg);color:var(--green);border:.5px solid rgba(59,109,17,.3);border-radius:var(--radius);padding:6px 12px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+@media(max-width:600px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.sr{grid-template-columns:1fr 60px 28px}.sr .srv{display:none}.pms{grid-template-columns:repeat(2,1fr)}.main-content{padding:10px 10px 80px}}
+
+.login-wrap{position:fixed;inset:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.login-box{background:var(--bg);border:.5px solid var(--border2);border-radius:var(--rlg);padding:32px 28px;width:100%;max-width:360px;text-align:center}
+.login-logo{font-size:40px;margin-bottom:12px}
+.login-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:22px}
+.login-inp{width:100%;padding:10px 14px;border:.5px solid var(--border2);border-radius:var(--radius);font-size:15px;background:var(--bg);color:var(--text);text-align:center;letter-spacing:4px;margin-bottom:12px;font-family:inherit}
+.login-inp:focus{outline:2px solid var(--green);outline-offset:1px}
+.login-err{color:var(--red);font-size:13px;margin-bottom:8px;min-height:18px}
+.conf-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
+.conf-box{background:var(--bg);border:.5px solid var(--border2);border-radius:var(--rlg);padding:24px;width:100%;max-width:340px;text-align:center}
+</style>
+</head>
+<body><div id="app"></div>
+<script>
+/* ============== FIREBASE CONFIG ============== */
+const firebaseConfig = {
+  apiKey: "AIzaSyA6OrI0upDlS81bGsnq5wsy92oSLN7r-68",
+  authDomain: "controlestudiofurinhos.firebaseapp.com",
+  projectId: "controlestudiofurinhos",
+  storageBucket: "controlestudiofurinhos.firebasestorage.app",
+  messagingSenderId: "166618788",
+  appId: "1:166618788:web:b23f76a344dac2bb2d2831"
+};
+firebase.initializeApp(firebaseConfig);
+window._auth = firebase.auth();
+window._db   = firebase.firestore();
+/* Sessão NÃO persistida — login obrigatório a cada abertura */
+window._auth.setPersistence(firebase.auth.Auth.Persistence.NONE).catch(()=>{});
+window._user = null;
+</script>
+<script>
+const{useState,useMemo,useRef,useEffect,useCallback}=React;
+const R=n=>"R$ "+Number(n).toFixed(2).replace(".",",");
+const P=n=>Number(n).toFixed(1).replace(".",",")+"%";
+const D=s=>{if(!s)return"";const[y,m,d]=s.split("-");return d+"/"+m+"/"+y};
+const FMT=p=>{const d=p.replace(/\D/g,"");return d.length===11?"("+d.slice(0,2)+") "+d.slice(2,7)+"-"+d.slice(7):d.length===10?"("+d.slice(0,2)+") "+d.slice(2,6)+"-"+d.slice(6):p};
+const localToday=()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');};
+const joiaDetalhe=j=>{const p=j.perf&&j.perf.trim()?j.perf:"";const l=j.local&&j.local.trim()?j.local:"";const extra=[p,l].filter(Boolean).join(" — ");return (j.desc||"Joia")+(extra?" ("+extra+")":"");}
+const vuC=(vp,qt)=>{const v=parseFloat(vp)||0,q=parseInt(qt)||0;return q>0?v/q:0};
+const FP=[{id:"pix",label:"PIX",ico:"\u26A1",cls:"pixbx"},{id:"dinheiro",label:"Dinheiro",ico:"\u{1F4B5}",cls:"ok"},{id:"debito",label:"Débito",ico:"\u{1F4B3}",cls:"bbx"},{id:"credito",label:"Crédito",ico:"\u{1F4B0}",cls:"cbx"},{id:"escambo",label:"Escambo",ico:"\uD83D\uDD04",cls:"ok"}];
+const FPM=Object.fromEntries(FP.map(f=>[f.id,f]));
+
+const AC_DEFAULT={
+  Piercing:["Lave com soro fisiológico 0,9% duas vezes ao dia","Não toque sem lavar as mãos antes","Evite piscinas, praias e banheiras por 4 semanas","Não gire nem mexa na joia","Evite cremes e perfumes no local","Use roupas e travesseiros sempre limpos","Em caso de secreção ou vermelhidão intensa, procure orientação profissional"],
+  Tatuagem:["Remova o curativo após 2 a 4 horas","Lave com sabão neutro e água morna","Aplique hidratante sem perfume 2 a 3 vezes ao dia","Não coce nem esfregue a tatuagem","Evite exposição ao sol por 30 dias","Não mergulhe em piscina ou mar","Descamação é normal — não force a pele"],
+  Expansor:["Limpe com soro fisiológico diariamente","Não acelere o processo de dilatação","Massageie com óleo de jojoba ou oliva","Use apenas materiais de qualidade certificada","Procure ajuda em caso de dor intensa"],
+  Consulta:["Siga as orientações passadas na consulta","Retorne em caso de dúvidas ou sintomas"],
+  Outro:["Mantenha o local limpo e seco","Evite sol e contato com água","Siga as orientações do profissional","Em caso de dúvidas, entre em contato"]
+};
+
+const MSG_DEFAULT="Ol\u00E1, {nome}!\n\nSeu procedimento de *{procedimento}* foi realizado com sucesso em {data}!{pagamento}\n\n*Principais cuidados:*\n{cuidados}{joias}\n\nQualquer d\u00FAvida, estamos \u00E0 disposi\u00E7\u00E3o. Cuide-se!";
+
+const VARS=[
+  {v:"{nome}",desc:"Nome do cliente"},
+  {v:"{procedimento}",desc:"Tipo do atendimento"},
+  {v:"{data}",desc:"Data do atendimento"},
+  {v:"{pagamento}",desc:"Forma de pagamento"},
+  {v:"{cuidados}",desc:"Todos os cuidados do procedimento"},
+];
+
+function buildMsg(tpl,cl,sv,ac){
+  const fp=sv.fp&&FPM[sv.fp]?"\n*Pagamento:* "+FPM[sv.fp].label:"";
+  const lista=(ac[sv.tp]||ac.Outro||[]).filter(x=>x.trim());
+  const cuidados=lista.map(x=>"• "+x).join("\n");
+  const joiasList=(sv.joias||[]).filter(j=>j.val>0);
+  const joiasBlock=joiasList.length?"\n\n*Joias implantadas:*\n"+joiasList.map(j=>"• "+joiaDetalhe(j)).join("\n"):"";
+  return tpl
+    .replace(/{nome}/g,cl.nm)
+    .replace(/{procedimento}/g,sv.tp)
+    .replace(/{data}/g,D(sv.dt))
+    .replace(/{pagamento}/g,fp)
+    .replace(/{cuidados}/g,cuidados)
+    .replace(/{joias}/g,joiasBlock)
+    +(joiasBlock&&!tpl.includes("{joias}")?joiasBlock:"");
+}
+
+function buildPreview(tpl,ac){
+  const lista=(ac.Piercing||AC_DEFAULT.Piercing).filter(x=>x.trim());
+  const cuidados=lista.map(x=>"• "+x).join("\n");
+  return tpl
+    .replace(/{nome}/g,"Maria Silva")
+    .replace(/{procedimento}/g,"Piercing")
+    .replace(/{data}/g,"28/04/2025")
+    .replace(/{pagamento}/g,"\n*Pagamento:* PIX")
+    .replace(/{cuidados}/g,cuidados);
+}
+
+const openWA=(ph,msg)=>{
+  const n=ph.replace(/\D/g,"");
+  const num=n.startsWith("55")?n:"55"+n;
+  const txt=encodeURIComponent(msg);
+  const ua=navigator.userAgent||"";
+  if(/android/i.test(ua)){
+    // Android: intent direto ao WhatsApp — sem passar por browser
+    window.location.href="intent://send?phone="+num+"&text="+txt+"#Intent;scheme=whatsapp;package=com.whatsapp;end";
+  } else if(/iphone|ipad|ipod/i.test(ua)){
+    // iOS
+    window.location.href="whatsapp://send?phone="+num+"&text="+txt;
+  } else {
+    // Desktop: fallback wa.me
+    window.open("https://wa.me/"+num+"?text="+txt,"_blank");
+  }
+};
+
+const LOCAIS_DEFAULT=["Orelha Direita","Orelha Esquerda","Umbigo","Nariz","Outro"];
+const PERFS_DEFAULT=["Aba Nasal","Anti Helix","Australianos","Conch","Daith","Eyebrow","Flat","Helix","Lóbulo 1","Lóbulo 2","Lóbulo 3","Mid Helix","Minions","Rook","Septo","Snug","Trágus","Umbigo","Outro"];
+const PRODS=[{id:1,nome:"COTONETE",vp:51.21,qt:3000,vu:0.02,st:2998},{id:2,nome:"AGULHA",vp:205.60,qt:200,vu:1.03,st:199},{id:3,nome:"CATETER",vp:109.90,qt:100,vu:1.10,st:100},{id:4,nome:"GAZE",vp:45.90,qt:50,vu:0.92,st:49},{id:5,nome:"ALCOOL SWAB 70%",vp:39.90,qt:500,vu:0.08,st:498},{id:6,nome:"BABADOR BANCADA",vp:32.88,qt:100,vu:0.33,st:99},{id:7,nome:"MASCARA",vp:16.99,qt:150,vu:0.11,st:149},{id:8,nome:"LUVA",vp:49.80,qt:200,vu:0.25,st:199},{id:9,nome:"TOCA",vp:16.99,qt:100,vu:0.17,st:98},{id:10,nome:"SORO FISIOLOGICO",vp:44.99,qt:100,vu:0.45,st:99},{id:11,nome:"PALITO PEGADOR",vp:50.91,qt:100,vu:0.51,st:99},{id:12,nome:"ENV.AUTOCLAVE PINÇA",vp:162.94,qt:400,vu:0.41,st:399},{id:13,nome:"ENV.AUTOCLAVE PIERCING",vp:78.86,qt:500,vu:0.16,st:499},{id:14,nome:"ENV.AUTOCLAVE TAPER",vp:78.86,qt:500,vu:0.16,st:499},{id:15,nome:"ENV.AUTOCLAVE CONDUTOR",vp:36.30,qt:200,vu:0.18,st:199},{id:16,nome:"TOALHA HIGIENIZADORA",vp:111.65,qt:600,vu:0.19,st:599}];
+
+const totalJoias=s=>s.joias?s.joias.reduce((a,j)=>a+(parseFloat(j.val)||0),0):(s.jv||0);
+const calc=(s,ps,colabs)=>{const ci=s.ins.reduce((a,i)=>{const p=ps.find(p=>p.id===i.pid);return a+(p?p.vu*i.q:0);},0);const cb=(colabs||[]).find(c=>c.id===parseInt(s.colabId));const cc=cb&&s.pr>0?s.pr*(parseFloat(cb.pct)||0)/100:0;const ct=ci+totalJoias(s);const l=s.pr-ct-cc;return{ci,ct,l,m:s.pr>0?(l/s.pr)*100:0,cc:cc,cbNome:cb?cb.nome:""}};
+
+
+/* ── Supabase sync ── */
+const SYNC_KEYS=["prods3","clients3","svcs3","jcat","desp","msgTpl","ac3","retMsgTpl","tabOrder","retEnviada","cardMsg","histCardMsg","permissions","colabs"];
+let _syncTimer=null;
+const _SB_DEFAULT={url:"https://qjhdjynrdwdilzuuwbtb.supabase.co",key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqaGRqeW5yZHdkaWx6dXV3YnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwOTg2MDYsImV4cCI6MjA5ODY3NDYwNn0.FW847C7O-fTj2ZBlaE_cajQuKF1g0v6bwONw34AXQXM"};
+const _sbCfg=()=>{try{const s=JSON.parse(localStorage.getItem("sbConfig")||"null");return(s&&s.url&&s.key)?s:_SB_DEFAULT;}catch{return _SB_DEFAULT;}};
+async function _pushToDB(){
+  const cfg=_sbCfg();if(!cfg||!cfg.url||!cfg.key)return;
+  const data={};
+  SYNC_KEYS.forEach(k=>{try{const v=localStorage.getItem(k);if(v!=null)data[k]=JSON.parse(v);}catch{}});
+  try{
+    await fetch(cfg.url+"/rest/v1/store",{
+      method:"POST",
+      headers:{apikey:cfg.key,"Authorization":"Bearer "+cfg.key,"Content-Type":"application/json","Prefer":"resolution=merge-duplicates"},
+      body:JSON.stringify({key:"appdata",value:data})
+    });
+  }catch(e){console.error("Sync:",e);}
+}
+function schedulePush(){clearTimeout(_syncTimer);_syncTimer=setTimeout(_pushToDB,2000);}
+
+/* useLS — agora salva no Firestore (sincroniza em tempo real) */
+function useLS(k,i){
+  const[v,sv]=useState(i);
+  const localRef=useRef(i);
+  const inited=useRef(false);
+  useEffect(()=>{
+    if(!window._db||!window._user)return;
+    const ref=window._db.collection("workspace").doc("shared").collection("data").doc(k);
+    const unsub=ref.onSnapshot(snap=>{
+      if(snap.exists){
+        const d=snap.data();
+        if(d&&d.value!==undefined){localRef.current=d.value;sv(d.value);}
+      } else if(!inited.current){
+        inited.current=true;
+        ref.set({value:i,updatedAt:new Date().toISOString()}).catch(e=>console.warn("init",k,e));
+      }
+    },err=>console.error("Firestore snap error",k,err));
+    return unsub;
+  },[k]);
+  const set=nv=>{
+    const val=typeof nv==="function"?nv(localRef.current):nv;
+    localRef.current=val;
+    sv(val);
+    if(window._db&&window._user){
+      window._db.collection("workspace").doc("shared").collection("data").doc(k)
+        .set({value:val,updatedAt:new Date().toISOString(),updatedBy:window._user.email||""})
+        .catch(e=>console.error("Firestore save error",k,e));
+    }
+  };
+  return[v,set];
+}
+
+
+/* ─────────────────── LOGIN ─────────────────── */
+/* Senha local mantida para o modal de confirmação de exclusão (ConfirmDelete/SenhaConfig) */
+const DEFAULT_SENHA="1234";
+
+/* Login usa Firebase Auth (e-mail + senha) */
+function Login(){
+  const[email,setEmail]=useState("");
+  const[pwd,setPwd]=useState("");
+  const[err,setErr]=useState("");
+  const[loading,setLoading]=useState(false);
+  const[mode,setMode]=useState("login");// "login" | "forgot"
+  const[resetSent,setResetSent]=useState(false);
+  const[resetEmail,setResetEmail]=useState("");
+
+  const inpStyle={width:"100%",padding:"10px 14px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:14,background:"var(--bg)",color:"var(--text)",marginBottom:10,fontFamily:"inherit",outline:"none"};
+
+  function doLogin(e){
+    e.preventDefault();setErr("");setLoading(true);
+    window._auth.signInWithEmailAndPassword(email.trim(),pwd)
+      .catch(ex=>{
+        const code=(ex&&ex.code)||"";
+        if(code==="auth/invalid-email") setErr("E-mail inválido.");
+        else if(code==="auth/too-many-requests") setErr("Muitas tentativas. Aguarde alguns minutos.");
+        else setErr("E-mail ou senha incorretos.");
+        setLoading(false);
+      });
+  }
+
+  function doReset(e){
+    e.preventDefault();setErr("");setLoading(true);
+    window._auth.sendPasswordResetEmail(resetEmail.trim())
+      .then(()=>{setResetSent(true);setLoading(false);})
+      .catch(ex=>{
+        const code=(ex&&ex.code)||"";
+        if(code==="auth/invalid-email"||code==="auth/user-not-found") setErr("E-mail não encontrado. Verifique o endereço.");
+        else setErr("Erro ao enviar. Tente novamente.");
+        setLoading(false);
+      });
+  }
+
+  return React.createElement("div",{className:"login-wrap"},
+    React.createElement("div",{className:"login-box"},
+      React.createElement("div",{className:"login-logo"},"💎"),
+      React.createElement("div",{className:"login-title"},"Controle de Custo e Lucro"),
+
+      mode==="login"&&React.createElement("div",null,
+        React.createElement("div",{className:"login-sub"},"Entre com seu e-mail e senha"),
+        React.createElement("form",{onSubmit:doLogin},
+          React.createElement("input",{type:"email",placeholder:"E-mail",value:email,autoFocus:true,onChange:e=>{setEmail(e.target.value);setErr("");},style:inpStyle,required:true}),
+          React.createElement("input",{type:"password",placeholder:"Senha",value:pwd,onChange:e=>{setPwd(e.target.value);setErr("");},style:inpStyle,required:true}),
+          React.createElement("div",{className:"login-err"},err),
+          React.createElement("button",{type:"submit",className:"btn bp",style:{width:"100%",fontSize:14,padding:"10px",marginBottom:10},disabled:loading},loading?"Entrando...":"Entrar"),
+          React.createElement("button",{type:"button",style:{background:"none",border:"none",color:"var(--text2)",fontSize:12,cursor:"pointer",width:"100%",textAlign:"center",padding:4},onClick:()=>{setMode("forgot");setErr("");setResetSent(false);}},"\uD83D\uDD11 Esqueci minha senha")
+        )
+      ),
+
+      mode==="forgot"&&React.createElement("div",null,
+        React.createElement("div",{className:"login-sub"},resetSent?"Verifique seu e-mail":"Redefinir senha"),
+        resetSent
+          ?React.createElement("div",null,
+              React.createElement("div",{style:{background:"var(--gbg)",border:".5px solid var(--green)",borderRadius:"var(--radius)",padding:"14px 16px",fontSize:13,color:"var(--green)",marginBottom:16,lineHeight:1.6}},
+                "\u2713 E-mail de redefinição enviado para ",React.createElement("strong",null,resetEmail),". Verifique sua caixa de entrada e spam."
+              ),
+              React.createElement("button",{className:"btn bp",style:{width:"100%",marginBottom:8},onClick:()=>{setMode("login");setResetSent(false);setResetEmail("");}},"\u2190 Voltar para o login")
+            )
+          :React.createElement("form",{onSubmit:doReset},
+              React.createElement("div",{style:{fontSize:13,color:"var(--text2)",marginBottom:12,lineHeight:1.5}},"Digite seu e-mail e enviaremos um link para redefinir sua senha."),
+              React.createElement("input",{type:"email",placeholder:"Seu e-mail",value:resetEmail,autoFocus:true,onChange:e=>{setResetEmail(e.target.value);setErr("");},style:inpStyle,required:true}),
+              React.createElement("div",{className:"login-err"},err),
+              React.createElement("button",{type:"submit",className:"btn bp",style:{width:"100%",fontSize:14,padding:"10px",marginBottom:10},disabled:loading},loading?"Enviando...":"Enviar link de redefinição"),
+              React.createElement("button",{type:"button",style:{background:"none",border:"none",color:"var(--text2)",fontSize:12,cursor:"pointer",width:"100%",textAlign:"center",padding:4},onClick:()=>{setMode("login");setErr("");}},"\u2190 Voltar para o login")
+            )
+      )
+    )
+  );
+}
+
+/* ─────────────────── CONFIRM DELETE ─────────────────── */
+function ConfirmDelete({onConfirm,onCancel}){
+  const[inp,setInp]=useState("");
+  const[err,setErr]=useState("");
+  const senha=localStorage.getItem("appSenha")||DEFAULT_SENHA;
+  function check(e){
+    e.preventDefault();
+    if(inp===senha){onConfirm();}
+    else{setErr("Senha incorreta.");setInp("");}
+  }
+  return React.createElement("div",{className:"conf-ov",onClick:e=>{if(e.target.className==="conf-ov")onCancel()}},
+    React.createElement("div",{className:"conf-box"},
+      React.createElement("div",{style:{fontSize:32,marginBottom:8}},"🗑️"),
+      React.createElement("div",{style:{fontWeight:700,fontSize:15,marginBottom:4}},"Confirmar exclusão"),
+      React.createElement("div",{style:{fontSize:13,color:"var(--text2)",marginBottom:16}},"Digite a senha para excluir este atendimento."),
+      React.createElement("form",{onSubmit:check},
+        React.createElement("input",{className:"login-inp",type:"password",placeholder:"••••",value:inp,autoFocus:true,onChange:e=>{setInp(e.target.value);setErr("");}}),
+        React.createElement("div",{className:"login-err"},err),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:4}},
+          React.createElement("button",{type:"button",className:"btn",onClick:onCancel},"Cancelar"),
+          React.createElement("button",{type:"submit",className:"btn bp"},"Confirmar")
+        )
+      )
+    )
+  );
+}
+
+/* ─────────────────── APP ─────────────────── */
+function App(){
+  const[tab,setTab]=useState("dash");
+  const[syncStatus,setSyncStatus]=useState("idle");// idle|loading|ok|error
+  useEffect(()=>{
+    if(sessionStorage.getItem("_sbLoaded")){sessionStorage.removeItem("_sbLoaded");setSyncStatus("ok");return;}
+    const cfg=_sbCfg();if(!cfg||!cfg.url||!cfg.key)return;
+    setSyncStatus("loading");
+    fetch(cfg.url+"/rest/v1/store?key=eq.appdata",{headers:{apikey:cfg.key,"Authorization":"Bearer "+cfg.key}})
+      .then(r=>r.json())
+      .then(rows=>{
+        if(rows&&rows[0]&&rows[0].value){
+          const data=rows[0].value;
+          SYNC_KEYS.forEach(k=>{if(data[k]!==undefined)localStorage.setItem(k,JSON.stringify(data[k]));});
+          sessionStorage.setItem("_sbLoaded","1");
+          window.location.reload();
+        } else {setSyncStatus("ok");}
+      })
+      .catch(()=>setSyncStatus("error"));
+  },[]);
+  const[ps,setPs]=useLS("prods3",PRODS);
+  const[cls,setCls]=useLS("clients3",[]);
+  const[svcs,setSvcs]=useLS("svcs3",[]);
+  const[msgTpl,setMsgTpl]=useLS("msgTpl",MSG_DEFAULT);
+  const[ac,setAc]=useLS("ac3",AC_DEFAULT);
+  const[desp,setDesp]=useLS("desp",[]);
+  const[colabs,setColabs]=useLS("colabs",[]);
+  const[customLocais,setCustomLocais]=useLS("customLocais",[]);
+  const[customPerfs,setCustomPerfs]=useLS("customPerfs",[]);
+  const[permissions,setPermissions]=useLS("permissions",[]);
+  // Merge default + custom, keeping Outro last
+  const LOCAIS=[...LOCAIS_DEFAULT.filter(x=>x!=="Outro"),...customLocais,"Outro"];
+  const PERFS=[...PERFS_DEFAULT.filter(x=>x!=="Outro"),...customPerfs,"Outro"];
+  const[retMsgTpl,setRetMsgTpl]=useLS("retMsgTpl","Ol\u00E1, {nome}!\n\nSeu procedimento de *{procedimento}* completou 25 dias.\n\nPodemos agendar o seu retorno? Estamos \u00E0 disposi\u00E7\u00E3o!");
+  const[jcat,setJcat]=useLS("jcat",[]);
+  const blk={tp:"Piercing",dt:localToday(),pr:"",cid:"",colabId:"",joias:[],fp:"",ins:[]};
+  const[ns,setNs]=useState(blk);
+
+  const stats=useMemo(()=>{
+    const pgos=svcs.filter(s=>s.pg);
+    const f=pgos.reduce((a,s)=>a+s.pr,0);
+    const c=pgos.reduce((a,s)=>a+calc(s,ps,colabs).ct,0);
+    const l=f-c;
+    const fm={};pgos.forEach(s=>{if(s.fp)fm[s.fp]=(fm[s.fp]||0)+s.pr;});
+    return{f,c,l,m:f>0?(l/f)*100:0,fm};
+  },[svcs,ps,colabs]);
+
+  const pv=useMemo(()=>{
+    const p=parseFloat(ns.pr)||0;
+    const tj=(ns.joias||[]).reduce((a,j)=>a+(parseFloat(j.val)||0),0);
+    const ci=ns.ins.reduce((a,i)=>{const x=ps.find(p=>p.id===parseInt(i.pid));return a+(x?x.vu*(parseInt(i.q)||0):0);},0);
+    const cb2=(colabs||[]).find(c=>c.id===parseInt(ns.colabId));const cc=cb2&&p>0?p*(parseFloat(cb2.pct)||0)/100:0;
+    const ct=ci+tj;const l=p-ct-cc;return{ci,ct,l,m:p>0?(l/p)*100:0,p,tj,cc:cc,cbNome:cb2?cb2.nome:""};
+  },[ns,ps,colabs]);
+
+  const addR=()=>setNs(s=>({...s,ins:[...s.ins,{pid:(ps[0]?.id||1),q:1}]}));
+  const delR=i=>setNs(s=>({...s,ins:s.ins.filter((_,x)=>x!==i)}));
+  const upR=(i,f,v)=>setNs(s=>({...s,ins:s.ins.map((r,x)=>x===i?{...r,[f]:v}:r)}));
+  const setN=(k,v)=>setNs(s=>({...s,[k]:v}));
+  const addJ=(jid)=>setNs(s=>{if(s.joias.length>=10)return s;const j=jcat.find(x=>x.id===jid);if(!j)return s;return{...s,joias:[...s.joias,{jid:j.id,desc:j.nome,val:j.preco,local:"",perf:""}]};});
+  const delJ=i=>setNs(s=>({...s,joias:s.joias.filter((_,x)=>x!==i)}));
+  const upJ=(i,f,v)=>setNs(s=>({...s,joias:s.joias.map((r,x)=>x===i?{...r,[f]:v}:r)}));
+
+  function saveSvc(){
+    if(!ns.pr)return;
+    const sv={id:Date.now(),cid:parseInt(ns.cid)||null,dt:ns.dt,tp:ns.tp,pr:parseFloat(ns.pr)||0,pg:false,fp:ns.fp||"",colabId:ns.colabId||"",ins:ns.ins.map(r=>({pid:parseInt(r.pid),q:parseInt(r.q)||1})),joias:(ns.joias||[]).map(j=>({jid:j.jid||null,desc:j.desc,val:parseFloat(j.val)||0,local:j.local||'',perf:j.perf||''})).filter(j=>j.val>0)};
+    setPs(p=>p.map(x=>{const c=sv.ins.find(i=>i.pid===x.id);return c?{...x,st:Math.max(0,x.st-c.q)}:x;}));
+    setJcat(jc=>jc.map(x=>{const used=sv.joias.filter(j=>j.jid===x.id).length;return used>0?{...x,st:Math.max(0,x.st-used)}:x;}));
+    setSvcs(s=>[sv,...s]);
+    setNs({...blk,dt:localToday()});
+    setTab("hist");
+  }
+
+  const marcarPago=(id,fp,escamboDesc)=>setSvcs(s=>s.map(x=>x.id===id?{...x,pg:true,fp:fp||x.fp||"",escamboDesc:fp==="escambo"?(escamboDesc||""):x.escamboDesc||""}:x));
+  const marcarPend=id=>setSvcs(s=>s.map(x=>x.id===id?{...x,pg:false,fp:"",msgEnviada:false}:x));
+  const marcarMsgEnviada=id=>setSvcs(s=>s.map(x=>x.id===id?{...x,msgEnviada:true}:x));
+
+  // ── Controle de acesso ──────────────────────────────────────────────────
+  const myEmail=(window._user?.email||"").toLowerCase().trim();
+  const ALL_PERMS_TABS=["dash","cls","prods","jcat","novo","hist","ret","cfg"];
+  const ADMIN_PERMS={email:myEmail,nome:"Admin",isAdmin:true,tabs:ALL_PERMS_TABS,canDelete:true,canExport:true,canFinancials:true,canEdit:true,ativo:true};
+  const currentPerms=permissions.length===0?ADMIN_PERMS:(permissions.find(p=>p.email.toLowerCase()===myEmail)||{email:myEmail,nome:"",isAdmin:false,tabs:[],canDelete:false,canExport:false,canFinancials:false,canEdit:false,ativo:false});
+  const isAdmin=currentPerms.isAdmin;
+  const allowedTabs=currentPerms.tabs||[];
+  const canDelete=currentPerms.canDelete||false;
+  const canExport=currentPerms.canExport||false;
+  const canFinancials=currentPerms.canFinancials||false;
+  const canEdit=currentPerms.canEdit||false;
+  const isBlocked=permissions.length>0&&!currentPerms.ativo;
+
+  const TAB_ICONS={dash:"📊",cls:"👥",prods:"📦",jcat:"💎",novo:"➕",hist:"📋",ret:"📅",cfg:"⚙️"};
+  const ALL_TABS=[["dash","Visão Geral"],["cls","Clientes"],["prods","Produtos"],["jcat","Joias"],["novo","Novo Atendimento"],["hist","Histórico"],["ret","Agend. Retorno"],["cfg","Config"]];
+  const[tabOrder,setTabOrder]=useLS("tabOrder",ALL_TABS.map(t=>t[0]));
+  const ORDERED_TABS=tabOrder.map(id=>ALL_TABS.find(t=>t[0]===id)).filter(Boolean).filter(([t])=>permissions.length===0||allowedTabs.includes(t));
+  const TABS=ORDERED_TABS.length>0?ORDERED_TABS:ALL_TABS;
+  const histAlert=svcs.some(s=>s.pg&&s.cid&&!s.msgEnviada);
+  const retAlert=(()=>{const t2=new Date();t2.setHours(0,0,0,0);return svcs.some(s=>{if(!s.cid)return false;const cl=cls.find(c=>c.id===s.cid);if(!cl)return false;const d=new Date(s.dt+"T00:00:00");d.setDate(d.getDate()+25);return Math.round((d-t2)/(864e5))<=0;});})();
+  function moveTabLeft(idx){if(idx===0)return;const o=[...tabOrder];[o[idx-1],o[idx]]=[o[idx],o[idx-1]];setTabOrder(o);}
+  function moveTabRight(idx){if(idx===TABS.length-1)return;const o=[...tabOrder];[o[idx],o[idx+1]]=[o[idx+1],o[idx]];setTabOrder(o);}
+
+  if(isBlocked)return React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",minHeight:"100vh",padding:20,background:"var(--bg3)"}},
+    React.createElement("div",{style:{textAlign:"center",maxWidth:340,background:"var(--bg)",borderRadius:"var(--rlg)",padding:36,border:".5px solid var(--border2)"}},
+      React.createElement("div",{style:{fontSize:48,marginBottom:12}},"\uD83D\uDD12"),
+      React.createElement("div",{style:{fontSize:18,fontWeight:700,marginBottom:8}},"Acesso bloqueado"),
+      React.createElement("div",{style:{fontSize:13,color:"var(--text2)",marginBottom:20,lineHeight:1.6}},"Sua conta ("+myEmail+") n\u00E3o tem permiss\u00E3o de acesso. Entre em contato com o administrador."),
+      React.createElement("button",{className:"btn bs",onClick:()=>window._auth.signOut()},"Sair")
+    )
+  );
+  const[sidebarOpen,setSidebarOpen]=useState(false);
+  const currentTabLabel=(TABS.find(([t])=>t===tab)||[])[1]||"";
+  return React.createElement("div",{className:"app-layout"},
+    /* ── MOBILE HEADER ── */
+    React.createElement("div",{className:"mob-header"},
+      React.createElement("button",{className:"mob-btn",onClick:()=>setSidebarOpen(true)},"☰"),
+      React.createElement("span",{className:"mob-title"},TAB_ICONS[tab]+" "+currentTabLabel),
+      React.createElement("span",{style:{width:32}})
+    ),
+    /* ── SIDEBAR OVERLAY (mobile) ── */
+    sidebarOpen&&React.createElement("div",{className:"sidebar-overlay",onClick:()=>setSidebarOpen(false)}),
+    /* ── SIDEBAR ── */
+    React.createElement("div",{className:"sidebar"+(sidebarOpen?" open":"")},
+      React.createElement("div",{className:"sidebar-logo",style:{textAlign:"center"}},
+        React.createElement("img",{src:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALUAAAB2CAYAAACOL9KzAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAMN0lEQVR4nO2df9BVRRnHv4SMjFaYAy/xZjioESYUDdFoNEEUM6Y5UEM0RKMwOugk0ERaZjXkRFGGmVKWYzUWFYROP3TQpsDsF1REouQoGYkROpKJKf2whO2PPWfuvs99zu6ec/acu3d9PjNn7ru7zz67577fc+6e/XWGKaUgCCnxgl5XQBBCI6IWkkNELSSHiFpIDhG1kBwiaiE5RNRCcoioheQQUQvJIaIWkkNELSSHiFpIDhG1kBwiaiE5RNRCcoioheQQUQvJIaIWkkNELSSHiFpIDhG1kBwiaiE5RNRCcoioheQQUQvJIaIWkqMfRD0OwHwAPwWgACwl6Wuz+DIoAHvrV63njAcwtdeViI1YRb0IWngKwKMAbgEwK0u7kth+MPtUJQ4AOAXAeofdWqOc1QU2BzzL3AvgJOZcd3vU1WSpkfYIgHuM8BrG/vmHUiq2w+R3SqkJSqkzSXyRvVJKXc7EKaXUDUqpAyRulVJqY4H9XqXUsUY5AwX5lxbkV0qp3Uqpf5O429TQ+s+05F9FbKmvqUqp0Uqpw0bcPtXM/6Vvjp5XgBzbjH/OvUx6zigmbsCIW62Gsr7Az/lZ+Epif6eljlsym4kFPnOmW9InWM4th6Zf4kg/ZKSttNQ/+SOm5scAgLOM8GsYm8HsM29XvyP7XAHgoGE3iuT7DwmfbuQDgC+T9D9a6rnLwwYA/kXCFxt//9mRl8Os4x1M+tuMv6+p4D8ZYhL1uzxsHgNwBMBpWThvT68jdv9z+Hkw+5yWfY4h6VSQJiMcvnOeIeGtJDwN/swn4Z8zNg+Q8IdL+K9DmfNohZhETR+iZhfYHYPOXW8GgF8xNsNJ+EnG5lrjb9dFEAJ6oVCh2phKwvT8gO7/5VtK+Od4u6fdqTXLCU5Mov4bCdM7G8cwAG+sWN7KLD/Q3Tw5UtGnDSrqRSXyvpaEuf8bFfqcEv45bkd3TxPHd2qWE5yYRP15Ju7rFX1RUdLmBYXeqY9WLLcMLy9hS58RuDt13QtxIwkPA/BpR551WV3G1Sw7KDGJGgAeJ+ElAOZW8ENF+U+HfRvNj2Nr5PURbN1zeHcJ2zOgb0LLsvCjAC5HJOKOTdQvZeJ+AH7QwgY9L9c/nNo38b1wd1df2vjlKMP90M23/Vn4agCfg36Q7zmxiRrgH3D2M3E2jidhV/OjjuB8afrXwLdXJiTjs8+2elq8iFHUdwH4BhNfZn4H/annej9M6PfQhMjpw2gZaPODq9/IGv4XZJ/HVci7wm3SLjGKGgAWA9jOxPsK+x8k7DpPKpImvpcXBfT134C+AOC72afr2YNjR8iKhCBWUQPAG9A9gAEAv2ygrDYeFGNiEvSD3jZ03yhUFr8ZwEIPX78OW7X6HNPrCjh4Mbq/9BnQgxG7ApbTRL90SEI3hx4E8E3ou+wggJONtD0AroL+tftD4HJbIXZRA7q/lAr7HnQGTkJARRNbb0MT7MqODdDTXycD+BP0Xbyvibn5YTKZiSsaRq9CG99DzL8GU7LPV/S0FoHoF1Hfz8T5DKP7QtvUbQiwTBmxtPkHUH6VUevEJOoJAC60pIdsblCeJeEmmh/UZ5kuPp8LoO6F+JSHzUF0T9ONjphEvQbAV3tUdp0+5KrQC8lGG218OkWhiPc1WosAxCTqfBbb6AC+qEht86OBbtHYRud82/J0MIQ2Ia739AMAP3L44sor23NB52P3LTGJOodOQa0CHRkbZK2KucKSxj20ctA+9rEkfJV/dfAlEvaZC7O4hH+gs4qo74lJ1ObdcRWTPp6EX2/xRe9aPsO/Pm3FfMnUJz1sKR+vkCeH/pK8k7GhcTtrlNff9HqRpHHcSBaWbjHSuBXiNl9Pl7QvWvw6zkhbZPF1KpN3qZE+01GXk5j8U4jNCJI+21L3SY7zTPoYplQ0PTSbAZzjYbcVwFsL0hbCvhJjFoCfOfy7vpCxGLrINx+48GUkhj4kusqjvT4u+3kAfliiPskR04jiudCjWfmi2LXoLKwF9GLTeQAOWXxsAHAm9GT1+6BXl4yAnqgzEm5BA1pEo6CHi8128CfAt4PPhe65OQr9gJo3fR7P6rETwMMAvl9Q3pug5yYfhJ5dODzLOx16xiJXvwvR3VP0KQAfKzyr5xEx3akFIQgxPSgKQhD6VdQHAfyl15UQupgI3eZf38tKxCTqvfDf4HEMOquxFzhsTbYx6b/xLPPv6Ez84XBtNnlTQfwA4+s6xu6A4zu6N8u7vMT3geycOLuiZwCTm0mePVn8ez3yNkZMoj6lQp4z0L0nho2TmTjfFSknQj98KgCXMunTHfmLllvtYeI420HYv6O8n981emouddsEfU45O9HZEm0e9Llyq+BfkqVdkIW3o9pWas3Q6z5FcixQ3VCbKUbaTUY8ZakqLofzPdejbJPFDt8+PnK4DSNN22kOH6M9yllD0q+z1HMSSTvOSJvoeX4926Qyxt4PWqGi2XmKpNN8YwA84ZnXt+zpAH7rqJvLB/eFb4devlbkq2w9Ad3cucizHhcB+BpJfwidPQuPoNP9a+a7AsBnmbKL6t0KMTU/OGzTKe925OXWN9aFLjKdGsjvWQXxVRbC5thW0N9Iwt9jbH5h/F20nKxopmHZLS2CEruobWvz3gzg1Zb0MlM7q1J1WzQOuu0X0L1/SRnos4Y5+5G+YoTjERKeje4ZlEW7To1H/b38KhO7qF3stqS1sblLmYdUCt1gh9v2q86vzU9IuKgpBgCHmTi6zcQ5jI/PWHxusaQ1Sr+L2kaVjVnahBMZvVvX2SvkxBK2nA5eSMJFzZkflyinFWITdZ1NFPuRZSRcZpNGF6H3jc7nwdC78xzolzxFQ2yibqMdHJKnauank/8Bv/auD6FHXPPm3EeYtI8CmBm4vMrEJmoXCvZRvba52G3i5BYSpj0TVQn9TGE2l7iuurvR3WTpCTFNPQXsF1ne3hwL+wNik9C+5E0BfObD/CYDGDpn28Wl0Bv8DEI34Z4EcH6AupnQ7sUV6F5n+Qx61DdtEpuoubsL/Yf/tY2KFGC+X+bqgH4fQOeNYYAeuub26i7iiwHrUgTtrVkHPXf9PSReocfCjq354dOmDrl7qA+LATyHoRfXNQi7J/OrSJgu0nUxGVpIg9DzRoaDn1NSB643aRH4hdJcF2FrxCZqjmHZkbc9af9p00xG9yDQh1oo9+YStvkOVo9B3xiOQs9IDElRlx43y/B49HB1ej+IOmeB22QIobYOuwz6ovpAA75N6E/2BayVP3TvE9tDHPcLSVew2wZvuOYGN/TeCv0kakBPHXW9aTYn9ODLF0jYtlYyRso2CeiFy024MuFGVx8qWWYQ+k3UZfpem9iqyxwsOaEB/z5v/W0L+v3dx1p12IXu7snTGLvG6TdRl8E1Wb4K9PXJofvMbw3srw60Jyq/099mycM1EVvf7zplUTex6SNte4Ya/TO51m0SHK4rlTbfxkG/h/w8Js3GjKqVqkpKoqZP501MaKJ95KezVvVY2YBPFz6vhd5h2H3b4ou+K972gNkIKYmavvrMNZ/39gpl0CZNU23GJnYgNe/GdLCGe88knTt9KzoX8TxLOTRf67tFpSRqevdYUmC3L/u8LECZ3ELeEMxqwKfZpbecpE1g7LkL1tx0smjK6SvLVKoJYhP1/Jr5zd6D89D9XvPV6AjRt2uQQtuItrcfVKXMvI8i6NyPs0n4W8bf9AF4HIZeWLnAzYGvOQDuJPn2kXAbbxLuplcrfpnjsCpmYwk/dJW0UkodImGfFd45NzD2lzB2z1l8PF1Qr02M7/yYztR3s6WM32c2cy02z5IyDpD05UqvOjdZaNjPtvimmCvQWz1iulPbhr/LzPd4P/RezWa/6gnZ51aUn2zDPeh8JfOzDJ3Za7a7UlH9bW3yHdB7aZh9v7Y5IQ9nn3Qfb5MnMLQZ8jIAr0NnoOV6dDac3w89j2SDYX9XZrsEen0ot8D2DujvpokuVS9i3CJBEGoR051aEIIgohaSQ0QtJIeIWkgOEbWQHCJqITlE1EJyiKiF5BBRC8khohaSQ0QtJIeIWkgOEbWQHCJqITlE1EJyiKiF5BBRC8khohaSQ0QtJIeIWkgOEbWQHCJqITlE1EJyiKiF5BBRC8khohaSQ0QtJIeIWkgOEbWQHCJqITlE1EJyiKiF5BBRC8khohaS4//jSJ7ljMn4VQAAAABJRU5ErkJggg==",alt:"Studio Furinhos",style:{width:"100%",maxWidth:200,marginBottom:10,display:"block"}}),
+        syncStatus==="loading"&&React.createElement("div",{style:{fontSize:10,color:"var(--amber)",marginTop:4}},"⟳ Sincronizando..."),
+        syncStatus==="ok"&&React.createElement("div",{style:{fontSize:10,color:"var(--green)",marginTop:4}},"✓ Sincronizado"),
+        syncStatus==="error"&&React.createElement("div",{style:{fontSize:10,color:"var(--red)",marginTop:4}},"✗ Erro sync")
+      ),
+      React.createElement("div",{className:"tabs"},
+        TABS.map(([t,l],idx)=>React.createElement("div",{key:t,className:"tab-row"},
+          React.createElement("button",{className:"tab"+(tab===t?" on":""),onClick:()=>{setTab(t);setSidebarOpen(false);}},
+            React.createElement("span",null,TAB_ICONS[t]),
+            React.createElement("span",{style:{flex:1}},l),
+            (t==="hist"&&histAlert||t==="ret"&&retAlert)&&React.createElement("span",{style:{color:"var(--red)",fontWeight:900,fontSize:13,lineHeight:1}},"!")
+          ),
+          React.createElement("div",{className:"tab-arrows"},
+            React.createElement("button",{onClick:e=>{e.stopPropagation();moveTabLeft(idx);},style:{border:"none",background:"none",cursor:"pointer",fontSize:9,lineHeight:1,padding:"1px 3px",color:"var(--text2)"},disabled:idx===0},"▲"),
+            React.createElement("button",{onClick:e=>{e.stopPropagation();moveTabRight(idx);},style:{border:"none",background:"none",cursor:"pointer",fontSize:9,lineHeight:1,padding:"1px 3px",color:"var(--text2)"},disabled:idx===TABS.length-1},"▼")
+          )
+        ))
+      )
+    ),
+    /* ── MAIN CONTENT ── */
+    React.createElement("div",{className:"main-content"},
+    tab==="dash"&&React.createElement(Dash,{stats,svcs,ps,cls,desp,setDesp,colabs:colabs,setColabs:setColabs,canFinancials:canFinancials,canExport:canExport}),
+    tab==="ret"&&React.createElement(Retorno,{svcs,cls,jcat,retMsgTpl,setRetMsgTpl}),
+    tab==="cls"&&React.createElement(Clientes,{cls,setCls,retMsgTpl}),
+    tab==="prods"&&React.createElement(Prods,{ps,setPs}),
+    tab==="jcat"&&React.createElement(JoiasTab,{jcat,setJcat}),
+    tab==="novo"&&React.createElement(Novo,{ns,setN,ps,cls,jcat,pv,addR,delR,upR,addJ,delJ,upJ,saveSvc,colabs:colabs}),
+    tab==="hist"&&React.createElement(Hist,{svcs,ps,cls,setSvcs,marcarPago,marcarPend,msgTpl,ac,marcarMsgEnviada,colabs:colabs,canDelete:canDelete,canFinancials:canFinancials,canEdit:canEdit}),
+    tab==="cfg"&&React.createElement(Cfg,{msgTpl,setMsgTpl,ac,setAc,isAdmin:isAdmin,permissions:permissions,setPermissions:setPermissions,myEmail:myEmail,customLocais,setCustomLocais,customPerfs,setCustomPerfs,LOCAIS,PERFS})
+  ));
+}
+
+
+/* -- COMISSOES -- */
+function ColabCard({colabs,setColabs,svcs}){
+  const[form,setForm]=useState({nome:"",pct:""});
+  function add(){if(!form.nome.trim()||!form.pct)return;setColabs([...colabs,{id:Date.now(),nome:form.nome.trim(),pct:parseFloat(form.pct)||0}]);setForm({nome:"",pct:""});}
+  function rem(id){setColabs(colabs.filter(c=>c.id!==id));}
+  const porColab=colabs.map(c=>{const total=svcs.filter(s=>s.pg&&parseInt(s.colabId)===c.id).reduce((a,s)=>a+s.pr*(parseFloat(c.pct)||0)/100,0);const atend=svcs.filter(s=>s.pg&&parseInt(s.colabId)===c.id).length;return{...c,total,atend};});
+  const totalGeral=porColab.reduce((a,c)=>a+c.total,0);
+  const inp={padding:"7px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)"};
+  return React.createElement("div",{className:"card"},
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
+      React.createElement("div",{className:"stl",style:{marginBottom:0}},"Colaboradores & Comissões"),
+      totalGeral>0&&React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--amber)"}},"Total pago: "+R(totalGeral))
+    ),
+    colabs.length===0&&React.createElement("div",{style:{fontSize:13,color:"var(--text2)",marginBottom:12}},"Nenhum colaborador cadastrado."),
+    porColab.map(c=>React.createElement("div",{key:c.id,style:{display:"flex",alignItems:"center",gap:10,padding:"9px 11px",background:"var(--bg2)",borderRadius:"var(--radius)",marginBottom:8,flexWrap:"wrap"}},
+      React.createElement("div",{style:{flex:1}},
+        React.createElement("div",{style:{fontWeight:600,fontSize:13}},c.nome),
+        React.createElement("div",{style:{fontSize:12,color:"var(--text2)"}},c.pct+"% de comissão")
+      ),
+      c.atend>0&&React.createElement("div",{style:{textAlign:"right",fontSize:12}},
+        React.createElement("div",{style:{fontWeight:700,color:"var(--amber)"}},R(c.total)),
+        React.createElement("div",{style:{color:"var(--text2)"}},c.atend+" atend.")
+      ),
+      React.createElement("button",{className:"btn bd bs",style:{padding:"3px 8px"},onClick:()=>rem(c.id)},"×")
+    )),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 140px auto",gap:8,marginTop:8,alignItems:"end"}},
+      React.createElement("input",{type:"text",placeholder:"Nome do colaborador",value:form.nome,onChange:e=>setForm(f=>({...f,nome:e.target.value})),style:inp}),
+      React.createElement("div",{style:{position:"relative"}},
+        React.createElement("input",{type:"number",step:".1",min:0,max:100,placeholder:"% comissão",value:form.pct,onChange:e=>setForm(f=>({...f,pct:e.target.value})),style:{...inp,width:"100%",paddingRight:22}}),
+        React.createElement("span",{style:{position:"absolute",right:8,top:"50%",transform:"translateY(-50%)",fontSize:12,color:"var(--text2)",pointerEvents:"none"}},"%")
+      ),
+      React.createElement("button",{className:"btn bp bs",onClick:add},"+ Adicionar")
+    )
+  );
+}
+/* ─────────────────── DASH ─────────────────── */
+function Dash({stats,svcs,ps,cls,desp,setDesp,colabs,setColabs,canFinancials,canExport}){
+  const cr=useRef(null);const ci=useRef(null);
+  const[expOpen,setExpOpen]=useState(false);
+  const[expDe,setExpDe]=useState("");const[expAte,setExpAte]=useState("");
+  const[newDesp,setNewDesp]=useState({dt:localToday(),nome:"",val:"",cat:"Studio"});
+  const[escamboModal,setEscamboModal]=useState(false);
+  const[despModal,setDespModal]=useState(false);
+  // ── Filtro de período ──────────────────────────────────────────────────────
+  const[filDe,setFilDe]=useState("");
+  const[filAte,setFilAte]=useState("");
+  const hoje=localToday();
+  const periodos=[
+    {label:"Hoje",de:hoje,ate:hoje},
+    {label:"7 dias",de:(()=>{const d=new Date(hoje+"T00:00:00");d.setDate(d.getDate()-6);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");})(),ate:hoje},
+    {label:"Mês atual",de:hoje.slice(0,7)+"-01",ate:hoje},
+    {label:"Mês passado",de:(()=>{const d=new Date(hoje+"T00:00:00");d.setDate(1);d.setMonth(d.getMonth()-1);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-01";})(),ate:(()=>{const d=new Date(hoje+"T00:00:00");d.setDate(0);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");})()},
+    {label:"Ano atual",de:hoje.slice(0,4)+"-01-01",ate:hoje},
+    {label:"Tudo",de:"",ate:""},
+  ];
+  const[periodoAtivo,setPeriodoAtivo]=useState("Tudo");
+  function aplicarPeriodo(p){setPeriodoAtivo(p.label);setFilDe(p.de);setFilAte(p.ate);}
+
+  // Filtro aplicado nos atendimentos
+  const svcsFil=svcs.filter(s=>{
+    if(filDe&&s.dt<filDe)return false;
+    if(filAte&&s.dt>filAte)return false;
+    return true;
+  });
+
+  // Stats filtradas
+  const pgos=svcsFil.filter(s=>s.pg);
+  const fF=pgos.reduce((a,s)=>a+s.pr,0);
+  const cF=pgos.reduce((a,s)=>a+calc(s,ps,colabs).ct,0);
+  const lF=fF-cF;
+  const fmF={};pgos.forEach(s=>{if(s.fp)fmF[s.fp]=(fmF[s.fp]||0)+s.pr;});
+  const filtStats={f:fF,c:cF,l:lF,m:fF>0?(lF/fF)*100:0,fm:fmF};
+
+  useEffect(()=>{
+    if(!cr.current)return;if(ci.current)ci.current.destroy();
+    const d=svcsFil.slice(-10);if(!d.length)return;
+    ci.current=new Chart(cr.current,{type:"bar",data:{labels:d.map(s=>{const[,m,dy]=s.dt.split("-");return dy+"/"+m}),datasets:[{label:"Receita",data:d.map(s=>s.pr),backgroundColor:"#639922",borderRadius:4},{label:"Custo",data:d.map(s=>calc(s,ps,colabs).ct),backgroundColor:"#B4B2A9",borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:"rgba(128,128,128,.1)"},ticks:{font:{size:11},callback:v=>"R$"+v}}}}});
+    return()=>{if(ci.current)ci.current.destroy();};
+  },[svcsFil,ps,desp]);
+
+  const totalD=desp.reduce((a,d)=>a+(parseFloat(d.val)||0),0);
+  const totalComissoes=(colabs||[]).length>0?svcsFil.filter(s=>s.pg&&s.colabId).reduce((acc,s)=>{const cb=(colabs||[]).find(c=>c.id===parseInt(s.colabId));return acc+(cb&&s.pr>0?s.pr*(parseFloat(cb.pct)||0)/100:0);},0):0;
+  const lucroReal=filtStats.l-totalD-totalComissoes;
+  const margem=filtStats.f>0?(lucroReal/filtStats.f)*100:0;
+  const fpe=Object.entries(filtStats.fm||{});
+
+  function exportExcel(){
+    const de=expDe||"2000-01-01", ate=expAte||"2099-12-31";
+    const rows=svcs.filter(s=>s.dt>=de&&s.dt<=ate);
+    if(!rows.length){alert("Nenhum atendimento no período.");return;}
+    const header=["Data","Tipo","Cliente","Receita","Custo Insumos","Custo Joias","Custo Total","Comissão","Colaborador","Lucro","Margem %","Forma Pgto","Pago"];
+    const body=rows.map(s=>{
+      const c=calc(s,ps,colabs);
+      const cl=s.cid?cls.find(x=>x.id===s.cid):null;
+      const[y,m,d]=s.dt.split("-");
+      const lucro=s.pr-c.ct-c.cc;
+      const margem=s.pr>0?(lucro/s.pr)*100:0;
+      return[d+"/"+m+"/"+y,s.tp,cl?cl.nm:"—",s.pr.toFixed(2),c.ci.toFixed(2),(totalJoias(s)).toFixed(2),c.ct.toFixed(2),c.cc.toFixed(2),c.cbNome||"—",lucro.toFixed(2),margem.toFixed(1),s.fp?FPM[s.fp]?.label||s.fp:"—",s.pg?"Sim":"Não"];
+    });
+    var lines=[header.map(function(v){return'"'+v+'"'}).join(";")];
+    body.forEach(function(r){lines.push(r.map(function(v){return'"'+String(v||"").replace(/"/g,"")+'"'}).join(";"));});
+    // Summary
+    var fat=rows.filter(s=>s.pg).reduce(function(a,s){return a+s.pr;},0);
+    var custo=rows.filter(s=>s.pg).reduce(function(a,s){return a+calc(s,ps,colabs).ct;},0);
+    var comissoes=rows.filter(s=>s.pg&&s.colabId).reduce(function(a,s){var cb=(colabs||[]).find(c=>c.id===parseInt(s.colabId));return a+(cb&&s.pr>0?s.pr*(parseFloat(cb.pct)||0)/100:0);},0);
+    var totDesp=desp.reduce(function(a,d){return a+(parseFloat(d.val)||0);},0);
+    var lucroBruto=fat-custo;
+    var lucroReal=lucroBruto-comissoes-totDesp;
+    var margem=fat>0?(lucroReal/fat)*100:0;
+    lines.push("");
+    lines.push('"RESUMO DO PERÍODO"');
+    lines.push('"Faturamento (pagos)";"'+fat.toFixed(2)+'"');
+    lines.push('"Custo total (insumos + joias)";"'+custo.toFixed(2)+'"');
+    lines.push('"Comissões";"'+comissoes.toFixed(2)+'"');
+    if(desp.length){
+      lines.push('"Despesas fixas";"'+totDesp.toFixed(2)+'"');
+      desp.forEach(function(d){lines.push('"  '+d.nome+'";"'+parseFloat(d.val).toFixed(2)+'"');});
+    }
+    lines.push('"Lucro real";"'+lucroReal.toFixed(2)+'"');
+    lines.push('"Margem real";"'+margem.toFixed(1)+'%"');
+    var blob=new Blob(['\uFEFF'+lines.join('\n')],{type:"text/csv;charset=utf-8"});
+    var a2=document.createElement("a");a2.href=URL.createObjectURL(blob);a2.download="faturamento_"+(expDe||"tudo")+".csv";document.body.appendChild(a2);a2.click();document.body.removeChild(a2);
+  }
+
+  function addDesp(){if(!newDesp.nome.trim()||!newDesp.val)return;const item={id:Date.now(),dt:newDesp.dt||localToday(),nome:newDesp.nome.trim(),val:parseFloat(newDesp.val)||0,cat:newDesp.cat||"Studio"};setDesp([...desp,item]);setNewDesp({dt:localToday(),nome:"",val:"",cat:"Studio"});}
+
+  return React.createElement("div",null,
+    /* Escambo modal */
+    escamboModal&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:16},onClick:e=>{if(e.target===e.currentTarget)setEscamboModal(false)}},
+      React.createElement("div",{style:{background:"var(--bg)",borderRadius:"var(--rlg)",padding:22,width:"100%",maxWidth:480,border:".5px solid var(--border2)",maxHeight:"80vh",overflowY:"auto"}},
+        React.createElement("div",{style:{fontWeight:700,fontSize:15,marginBottom:14}},"Escambos registrados"),
+        svcs.filter(s=>s.pg&&s.fp==="escambo").length===0&&React.createElement("div",{style:{color:"var(--text2)",fontSize:13,marginBottom:12}},"Nenhum escambo registrado."),
+        svcs.filter(s=>s.pg&&s.fp==="escambo").map(s=>{
+          const cl=s.cid?cls.find(c=>c.id===s.cid):null;
+          const[y,m,d]=s.dt.split("-");
+          return React.createElement("div",{key:s.id,style:{borderBottom:".5px solid var(--border)",paddingBottom:12,marginBottom:12}},
+            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:4}},
+              React.createElement("span",{style:{fontWeight:600}},cl?cl.nm:"Sem cliente"),
+              React.createElement("span",{style:{color:"var(--text2)"}},d+"/"+m+"/"+y)
+            ),
+            React.createElement("div",{style:{fontSize:12,color:"var(--text2)",marginBottom:6}},s.tp+" \u2022 "+R(s.pr)),
+            React.createElement("div",{style:{fontSize:13,background:"var(--bg2)",borderRadius:"var(--radius)",padding:"8px 10px",lineHeight:1.5}},s.escamboDesc||"(sem descrição)")
+          );
+        }),
+        React.createElement("button",{className:"btn bs",style:{width:"100%",marginTop:4},onClick:()=>setEscamboModal(false)},"Fechar")
+      )
+    ),
+
+    /* ── Filtro de período ── */
+    React.createElement("div",{className:"card",style:{padding:"12px 14px",marginBottom:14}},
+      React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:8}},"Período"),
+      React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8}},
+        periodos.map(p=>React.createElement("button",{key:p.label,style:{fontSize:11,padding:"4px 10px",borderRadius:20,border:".5px solid "+(periodoAtivo===p.label?"var(--green)":"var(--border2)"),background:periodoAtivo===p.label?"var(--gbg)":"var(--bg2)",color:periodoAtivo===p.label?"var(--green)":"var(--text2)",cursor:"pointer",fontWeight:periodoAtivo===p.label?700:400},onClick:()=>aplicarPeriodo(p)},p.label))
+      ),
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",fontSize:12,color:"var(--text2)"}},
+        "De ",
+        React.createElement("input",{type:"date",value:filDe,onChange:e=>{setFilDe(e.target.value);setPeriodoAtivo("personalizado");},style:{padding:"4px 8px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg)",color:"var(--text)"}}),
+        " até ",
+        React.createElement("input",{type:"date",value:filAte,onChange:e=>{setFilAte(e.target.value);setPeriodoAtivo("personalizado");},style:{padding:"4px 8px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg)",color:"var(--text)"}}),
+        (filDe||filAte)&&React.createElement("button",{style:{fontSize:11,padding:"4px 8px",borderRadius:20,border:".5px solid var(--border2)",background:"var(--bg2)",color:"var(--text2)",cursor:"pointer"},onClick:()=>{setFilDe("");setFilAte("");setPeriodoAtivo("Tudo");}},"Limpar")
+      )
+    ),
+
+    despModal&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:16},onClick:function(e){if(e.target===e.currentTarget)setDespModal(false);}},
+      React.createElement("div",{style:{background:"var(--bg)",borderRadius:"var(--rlg)",padding:22,width:"100%",maxWidth:500,border:".5px solid var(--border2)",maxHeight:"85vh",overflowY:"auto"}},
+        React.createElement("div",{style:{fontWeight:700,fontSize:15,marginBottom:16}},"Despesas Mensais \u2014 "+R(totalD)),
+        (function(){
+          var studio=desp.filter(function(d){return(d.cat||"Studio")==="Studio";});
+          var pessoal=desp.filter(function(d){return d.cat==="Pessoal";});
+          var totS=studio.reduce(function(a,d){return a+(parseFloat(d.val)||0);},0);
+          var totP=pessoal.reduce(function(a,d){return a+(parseFloat(d.val)||0);},0);
+          function Sec(items,title,tot,cor){
+            if(!items.length)return null;
+            return React.createElement("div",{style:{marginBottom:16}},
+              React.createElement("div",{style:{display:"flex",justifyContent:"space-between",padding:"8px 12px",borderRadius:"var(--radius)",background:cor==="azul"?"var(--bbg)":"var(--abg)",marginBottom:6}},
+                React.createElement("span",{style:{fontWeight:700,fontSize:14,color:cor==="azul"?"var(--blue)":"var(--amber)"}},"\u25CF "+title),
+                React.createElement("span",{style:{fontWeight:700,fontSize:14,color:cor==="azul"?"var(--blue)":"var(--amber)"}},R(tot))
+              ),
+              items.map(function(d,i){
+                var p=(d.dt||"").split("-");
+                var dtFmt=d.dt?(p[2]+"/"+p[1]+"/"+p[0]):"\u2014";
+                return React.createElement("div",{key:d.id,style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 10px",borderBottom:i<items.length-1?".5px solid var(--border)":"none"}},
+                  React.createElement("div",null,
+                    React.createElement("div",{style:{fontSize:13}},d.nome),
+                    React.createElement("div",{style:{fontSize:11,color:"var(--text2)"}},dtFmt)
+                  ),
+                  React.createElement("span",{style:{fontWeight:600,fontSize:13}},R(d.val))
+                );
+              })
+            );
+          }
+          return React.createElement("div",null,Sec(studio,"Studio",totS,"azul"),Sec(pessoal,"Pessoal",totP,"ambar"));
+        })(),
+        React.createElement("button",{className:"btn bs",style:{width:"100%",marginTop:8},onClick:function(){setDespModal(false);}},"Fechar")
+      )
+    ),
+
+    React.createElement("div",{className:"kg"},[["Faturamento",R(filtStats.f),"b"],["Despesa Mensal",R(totalD),"_desp"],["Custo",R(filtStats.c),""],["Comiss\u00F5es",R(totalComissoes),""],["Lucro real",R(lucroReal),lucroReal>=0?"g":"r"],["Margem",P(margem),margem>=0?"g":"r"],["Atendimentos",""+svcsFil.length,""],["Clientes",""+cls.length,""]].map(function(item){var l=item[0],v=item[1],c=item[2];var isD=c==="_desp";return React.createElement("div",{className:"kpi",key:l,onClick:isD?function(){setDespModal(true);}:undefined,style:isD?{cursor:"pointer",outline:".5px solid var(--border2)",borderRadius:"var(--radius)"}:{}},React.createElement("div",{className:"kl"},l+(isD?" \u{1F4CB}":"")),React.createElement("div",{className:"kv "+(isD?"":c||"")},v));})),
+    React.createElement("div",{className:"kg",style:{marginTop:-6}},FP.map(function(f){
+      var total=filtStats.fm&&filtStats.fm[f.id]?filtStats.fm[f.id]:0;
+      var isEsc=f.id==="escambo";
+      return React.createElement("div",{key:f.id,className:"kpi",
+        onClick:isEsc&&total>0?function(){setEscamboModal(true);}:undefined,
+        style:isEsc&&total>0?{cursor:"pointer",outline:".5px solid var(--border2)",borderRadius:"var(--radius)"}:{}
+      },
+        React.createElement("div",{className:"kl"},f.ico+" "+f.label+(isEsc&&total>0?" \uD83D\uDCCB":"")),
+        React.createElement("div",{className:"kv",style:{color:total>0?"var(--text)":"var(--text2)",fontSize:total>0?undefined:"14px"}},R(total))
+      );
+    })),
+
+    /* Despesas fixas */
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
+        React.createElement("div",{className:"stl",style:{marginBottom:0}},"Despesa Mensal — Total: "+R(totalD)),
+        canExport&&React.createElement("button",{className:"btn bs",onClick:()=>setExpOpen(o=>!o)},expOpen?"Fechar":"Exportar período")
+      ),
+      expOpen&&React.createElement("div",{style:{background:"var(--bg2)",borderRadius:"var(--radius)",padding:"12px 14px",marginBottom:12}},
+        React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"var(--text2)",marginBottom:8}},"EXPORTAR FATURAMENTO PARA EXCEL (.CSV)"),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr auto",gap:8,alignItems:"end"}},
+          React.createElement("div",{className:"fg"},React.createElement("label",null,"De"),React.createElement("input",{type:"date",value:expDe,onChange:e=>setExpDe(e.target.value)})),
+          React.createElement("div",{className:"fg"},React.createElement("label",null,"Até"),React.createElement("input",{type:"date",value:expAte,onChange:e=>setExpAte(e.target.value)})),
+          React.createElement("button",{className:"btn bp",onClick:exportExcel},"Exportar")
+        )
+      ),
+      /* lista despesas */
+      desp.length>0&&React.createElement("div",{style:{display:"grid",gridTemplateColumns:"110px 1fr auto auto auto",gap:0,marginBottom:2}},
+        ["Data","Despesa","Tipo","Valor",""].map(h=>React.createElement("div",{key:h,style:{fontSize:10,fontWeight:600,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".04em",padding:"4px 8px 4px 0"}},h))
+      ),
+      desp.map((d,i)=>{
+        const[y,m,day]=((d.dt)||"").split("-");
+        const dtFmt=d.dt?(day+"/"+m+"/"+y):"—";
+        const isCat=d.cat||"Studio";
+        return React.createElement("div",{key:d.id,style:{display:"grid",gridTemplateColumns:"110px 1fr auto auto auto",gap:0,alignItems:"center",padding:"7px 0",borderBottom:".5px solid var(--border)"}},
+          React.createElement("span",{style:{fontSize:12,color:"var(--text2)"}},dtFmt),
+          React.createElement("span",{style:{fontSize:13,fontWeight:500}},d.nome),
+          React.createElement("span",{style:{fontSize:11,padding:"2px 8px",borderRadius:20,background:isCat==="Pessoal"?"var(--abg)":"var(--bbg)",color:isCat==="Pessoal"?"var(--amber)":"var(--blue)",fontWeight:600,whiteSpace:"nowrap"}},isCat),
+          React.createElement("span",{style:{fontWeight:600,fontSize:13,textAlign:"right",paddingRight:10}},R(d.val)),
+          React.createElement("button",{className:"btn bd bs",style:{padding:"2px 7px"},onClick:()=>setDesp(prev=>prev.filter(x=>x.id!==d.id))},"×")
+        );
+      }),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"120px 1fr 110px 120px auto",gap:7,marginTop:12,alignItems:"end"}},
+        React.createElement("input",{type:"date",value:newDesp.dt,onChange:e=>setNewDesp(n=>({...n,dt:e.target.value})),style:{padding:"7px 8px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg)",color:"var(--text)"}}),
+        React.createElement("input",{type:"text",placeholder:"Ex: Aluguel, Marketing...",value:newDesp.nome,onChange:e=>setNewDesp(n=>({...n,nome:e.target.value})),style:{padding:"7px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)"}}),
+        React.createElement("select",{value:newDesp.cat,onChange:e=>setNewDesp(n=>({...n,cat:e.target.value})),style:{padding:"7px 8px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)"}},
+          React.createElement("option",{value:"Studio"},"Studio"),
+          React.createElement("option",{value:"Pessoal"},"Pessoal")
+        ),
+        React.createElement("input",{type:"number",step:".01",placeholder:"R$ 0,00",value:newDesp.val,onChange:e=>setNewDesp(n=>({...n,val:e.target.value})),style:{padding:"7px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)"}}),
+        React.createElement("button",{className:"btn bp bs",onClick:addDesp},"+ Adicionar")
+      )
+    ),
+
+    React.createElement(ColabCard,{colabs:colabs,setColabs:setColabs,svcs:svcs}),
+    svcs.length>0?React.createElement("div",{className:"card"},
+      React.createElement("div",{style:{display:"flex",gap:14,marginBottom:10}},[["#639922","Receita"],["#B4B2A9","Custo"]].map(([c,l])=>React.createElement("span",{key:l,style:{display:"flex",alignItems:"center",gap:5,fontSize:12,color:"var(--text2)"}},React.createElement("span",{style:{width:11,height:11,borderRadius:2,background:c,display:"inline-block"}}),l))),
+      React.createElement("div",{style:{height:200,position:"relative"}},React.createElement("canvas",{ref:cr}))
+    ):React.createElement("div",{className:"empty"},"Nenhum atendimento registrado ainda.")
+  );
+}
+
+/* ─────────────────── CLIENTES ─────────────────── */
+function Clientes({cls,setCls,retMsgTpl}){
+  const BLANK={nm:"",ph:"",retMsg:""};
+  const[f,setF]=useState(BLANK);const[eid,setEid]=useState(null);const[expRet,setExpRet]=useState({});
+  const sv=()=>{if(!f.nm.trim()||!f.ph.trim())return;if(eid){setCls(p=>p.map(c=>c.id===eid?{...c,...f}:c));setEid(null);}else setCls(p=>[...p,{id:Date.now(),...f}]);setF(BLANK);};
+  const ed=c=>{setEid(c.id);setF({nm:c.nm,ph:c.ph,retMsg:c.retMsg||""});};
+  const togRet=id=>setExpRet(e=>({...e,[id]:!e[id]}));
+  const saveRet=(id,msg)=>{setCls(p=>p.map(c=>c.id===id?{...c,retMsg:msg}:c));};
+  return React.createElement("div",null,
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{className:"stl"},eid?"Editar cliente":"Novo cliente"),
+      React.createElement("div",{className:"fgrid g2"},
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Nome completo"),React.createElement("input",{type:"text",placeholder:"Nome do cliente",value:f.nm,onChange:e=>setF(x=>({...x,nm:e.target.value}))})),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Telefone / WhatsApp"),React.createElement("input",{type:"tel",placeholder:"(11) 99999-0000",value:f.ph,onChange:e=>setF(x=>({...x,ph:e.target.value}))}))
+      ),
+      React.createElement("div",{className:"fg",style:{marginBottom:12}},
+        React.createElement("label",null,"Mensagem de retorno personalizada (opcional)"),
+        React.createElement("textarea",{rows:3,placeholder:"Deixe vazio para usar a mensagem padrão da aba Agend. Retorno",value:f.retMsg||"",onChange:e=>setF(x=>({...x,retMsg:e.target.value})),style:{width:"100%",padding:"8px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",resize:"vertical",fontFamily:"inherit",lineHeight:1.5}})
+      ),
+      React.createElement("div",{style:{display:"flex",gap:8}},
+        React.createElement("button",{className:"btn bp",onClick:sv},eid?"Salvar":"Cadastrar cliente"),
+        eid&&React.createElement("button",{className:"btn",onClick:()=>{setEid(null);setF(BLANK);}},"Cancelar")
+      )
+    ),
+    !cls.length?React.createElement("div",{className:"empty"},"Nenhum cliente cadastrado."):
+    React.createElement("div",null,cls.map(c=>
+      React.createElement("div",{key:c.id,className:"card",style:{marginBottom:8,padding:"12px 14px"}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:6}},
+          React.createElement("div",null,
+            React.createElement("div",{style:{fontWeight:600,fontSize:14}},c.nm),
+            React.createElement("div",{style:{fontSize:12,color:"var(--text2)",marginTop:2}},FMT(c.ph))
+          ),
+          React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
+            React.createElement("button",{className:"btn bs",style:{fontSize:11},onClick:()=>togRet(c.id)},expRet[c.id]?"Fechar msg":"Msg retorno"),
+            React.createElement("button",{className:"btn bs",onClick:()=>ed(c)},"Editar"),
+            React.createElement("button",{className:"btn bd bs",onClick:()=>setCls(p=>p.filter(x=>x.id!==c.id))},"Remover")
+          )
+        ),
+        expRet[c.id]&&React.createElement(RetMsgEditor,{c,retMsgTpl,saveRet})
+      )
+    ))
+  );
+}
+
+function RetMsgEditor({c,retMsgTpl,saveRet}){
+  const[draft,setDraft]=useState(c.retMsg||"");
+  const[saved,setSaved]=useState(false);
+  function save(){saveRet(c.id,draft);setSaved(true);setTimeout(()=>setSaved(false),2000);}
+  function reset(){setDraft("");}
+  return React.createElement("div",{style:{marginTop:12,borderTop:".5px solid var(--border)",paddingTop:10}},
+    React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:6}},"Mensagem de retorno personalizada"),
+    React.createElement("div",{style:{fontSize:12,color:"var(--text2)",marginBottom:6}},"Variáveis: {nome} {procedimento} {data} — Vazio = usa mensagem padrão"),
+    React.createElement("textarea",{rows:4,value:draft,onChange:e=>setDraft(e.target.value),placeholder:"Deixe vazio para usar a mensagem padrão...",style:{width:"100%",padding:"8px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg)",color:"var(--text)",resize:"vertical",fontFamily:"monospace",lineHeight:1.5,marginBottom:8}}),
+    React.createElement("div",{style:{fontSize:12,color:"var(--text2)",background:"var(--bg2)",borderRadius:"var(--radius)",padding:"8px 10px",marginBottom:8,lineHeight:1.5}},
+      React.createElement("strong",null,"Prévia: "),
+      (draft||retMsgTpl).replace(/{nome}/g,c.nm).replace(/{procedimento}/g,"Piercing").replace(/{data}/g,"28/04/2025")
+    ),
+    React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+      React.createElement("button",{className:"btn bp bs",onClick:save},"Salvar"),
+      React.createElement("button",{className:"btn bs",onClick:reset},"Usar padrão"),
+      saved&&React.createElement("span",{className:"alert-ok"},"✓ Salvo!")
+    )
+  );
+}
+
+/* ─────────────────── PRODUTOS ─────────────────── */
+function Prods({ps,setPs}){
+  const E={nome:"",vp:"",qt:"",st:""};
+  const[form,setForm]=useState(E);const[show,setShow]=useState(false);const[ed,setEd]=useState({});
+  const[posEdit,setPosEdit]=useState({});// id -> draft string position
+
+  function add(){if(!form.nome.trim()||!form.vp||!form.qt)return;const vp=parseFloat(form.vp)||0,qt=parseInt(form.qt)||0,st=form.st!==""?parseInt(form.st):qt;setPs(p=>[...p,{id:Date.now(),nome:form.nome.toUpperCase().trim(),vp,qt,vu:qt>0?vp/qt:0,st}]);setForm(E);setShow(false);}
+  const stE=p=>setEd(e=>({...e,[p.id]:{vp:p.vp,qt:p.qt,st:p.st}}));
+  function svE(p){const e=ed[p.id];if(!e)return;const vp=parseFloat(e.vp)||0,qt=parseInt(e.qt)||0,st=parseInt(e.st)||0;setPs(prev=>prev.map(x=>x.id===p.id?{...x,vp,qt,vu:qt>0?vp/qt:0,st}:x));setEd(e=>{const n={...e};delete n[p.id];return n;});}
+  const cE=id=>setEd(e=>{const n={...e};delete n[id];return n;});
+  const upE=(id,f,v)=>setEd(e=>({...e,[id]:{...e[id],[f]:v}}));
+
+  function moveUp(idx){if(idx===0)return;setPs(arr=>{const a=[...arr];[a[idx-1],a[idx]]=[a[idx],a[idx-1]];return a;});}
+  function moveDn(idx){setPs(arr=>{if(idx>=arr.length-1)return arr;const a=[...arr];[a[idx],a[idx+1]]=[a[idx+1],a[idx]];return a;});}
+  function moveTo(id,idx,rawVal){
+    const dest=parseInt(rawVal);
+    if(isNaN(dest))return;
+    const clamp=Math.min(Math.max(dest,1),ps.length)-1;
+    setPs(arr=>{const a=[...arr];const[item]=a.splice(idx,1);a.splice(clamp,0,item);return a;});
+    setPosEdit(p=>{const n={...p};delete n[id];return n;});
+  }
+
+  return React.createElement("div",null,
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
+      React.createElement("span",{style:{fontSize:13,color:"var(--text2)"}},ps.length+" produto(s)"),
+      React.createElement("button",{className:"btn bp bs",onClick:()=>setShow(s=>!s)},show?"✕ Cancelar":"+ Novo produto")
+    ),
+    show&&React.createElement("div",{className:"card",style:{marginBottom:14}},
+      React.createElement("div",{className:"stl"},"Cadastrar produto"),
+      React.createElement("div",{className:"fgrid g3"},
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Nome"),React.createElement("input",{type:"text",placeholder:"Ex: AGULHA 18G",value:form.nome,onChange:e=>setForm(f=>({...f,nome:e.target.value}))})),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Qtd compra"),React.createElement("input",{type:"number",min:1,placeholder:"100",value:form.qt,onChange:e=>setForm(f=>({...f,qt:e.target.value}))})),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Valor pago (R$)"),React.createElement("input",{type:"number",step:".01",placeholder:"45,00",value:form.vp,onChange:e=>setForm(f=>({...f,vp:e.target.value}))})),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Custo unit. (auto)"),React.createElement("input",{readOnly:true,value:form.vp&&form.qt?R(vuC(form.vp,form.qt)):"—",style:{padding:"8px 10px",border:".5px solid var(--border)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg2)",color:"var(--text2)",width:"100%"}}))
+      ),
+      React.createElement("div",{className:"fg",style:{maxWidth:320,marginBottom:14}},
+        React.createElement("label",null,"Estoque inicial (opcional)"),
+        React.createElement("input",{type:"number",min:0,placeholder:"Vazio = usa qtd compra",value:form.st,onChange:e=>setForm(f=>({...f,st:e.target.value}))})
+      ),
+      React.createElement("button",{className:"btn bp",onClick:add},"Cadastrar produto")
+    ),
+    React.createElement("div",{className:"card",style:{padding:0,overflow:"hidden"}},
+      React.createElement("div",{className:"scr"},React.createElement("table",null,
+        React.createElement("thead",null,React.createElement("tr",null,["Pos.","Produto","Qtd compra","Valor pago","Custo unit.","Estoque","Status",""].map(h=>React.createElement("th",{key:h,style:{padding:"10px 12px"}},h)))),
+        React.createElement("tbody",null,ps.map((p,idx)=>{
+          const e=ed[p.id];const pct=p.qt>0?p.st/p.qt:0;const sc=pct>.2?"ok":pct>0?"lw":"no";const sl={ok:"Normal",lw:"Baixo",no:"Zerado"};
+          const posDraft=posEdit[p.id]!=null?posEdit[p.id]:String(idx+1);
+          return React.createElement("tr",{key:p.id},
+            /* ── Posição ── */
+            React.createElement("td",{style:{padding:"7px 8px",whiteSpace:"nowrap"}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:4}},
+                React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:1}},
+                  React.createElement("button",{className:"btn bs",style:{padding:"1px 5px",fontSize:10,lineHeight:1.2},disabled:idx===0,onClick:()=>moveUp(idx)},"\u25B2"),
+                  React.createElement("button",{className:"btn bs",style:{padding:"1px 5px",fontSize:10,lineHeight:1.2},disabled:idx===ps.length-1,onClick:()=>moveDn(idx)},"\u25BC")
+                ),
+                React.createElement("input",{
+                  type:"number",min:1,max:ps.length,
+                  value:posDraft,
+                  style:{width:40,padding:"4px 5px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg)",color:"var(--text)",textAlign:"center"},
+                  onChange:ev=>setPosEdit(p2=>({...p2,[p.id]:ev.target.value})),
+                  onBlur:ev=>moveTo(p.id,idx,ev.target.value),
+                  onKeyDown:ev=>{if(ev.key==="Enter")moveTo(p.id,idx,ev.target.value);}
+                })
+              )
+            ),
+            React.createElement("td",{style:{fontWeight:600,whiteSpace:"nowrap",padding:"7px 12px"}},p.nome),
+            React.createElement("td",{style:{padding:"7px 12px"}},e?React.createElement("input",{type:"number",min:1,value:e.qt,onChange:ev=>upE(p.id,"qt",ev.target.value),className:"td-i",style:{width:72}}):p.qt.toLocaleString("pt-BR")),
+            React.createElement("td",{style:{padding:"7px 12px"}},e?React.createElement("input",{type:"number",step:".01",value:e.vp,onChange:ev=>upE(p.id,"vp",ev.target.value),className:"td-i",style:{width:90}}):R(p.vp)),
+            React.createElement("td",{style:{padding:"7px 12px"}},e?React.createElement("span",{style:{fontSize:12,color:"var(--green)",fontWeight:700}},R(vuC(e.vp,e.qt))):R(p.vu)),
+            React.createElement("td",{style:{padding:"7px 12px"}},e?React.createElement("input",{type:"number",min:0,value:e.st,onChange:ev=>upE(p.id,"st",ev.target.value),className:"td-i",style:{width:72}}):p.st.toLocaleString("pt-BR")),
+            React.createElement("td",{style:{padding:"7px 12px"}},React.createElement("span",{className:"bx "+sc},sl[sc])),
+            React.createElement("td",{style:{whiteSpace:"nowrap",padding:"7px 12px"}},
+              e?React.createElement("div",{style:{display:"flex",gap:5}},React.createElement("button",{className:"btn bp bs",onClick:()=>svE(p)},"Salvar"),React.createElement("button",{className:"btn bs",onClick:()=>cE(p.id)},"Cancelar")):
+              React.createElement("div",{style:{display:"flex",gap:5}},React.createElement("button",{className:"btn bs",onClick:()=>stE(p)},"Editar"),React.createElement("button",{className:"btn bd bs",onClick:()=>setPs(prev=>prev.filter(x=>x.id!==p.id))},"Remover"))
+            )
+          );
+        }))
+      ))
+    )
+  );
+}
+
+/* ─────────────────── NOVO ATENDIMENTO ─────────────────── */
+function Novo({ns,setN,ps,cls,jcat,pv,addR,delR,upR,addJ,delJ,upJ,saveSvc,colabs,LOCAIS,PERFS}){
+  LOCAIS=LOCAIS||LOCAIS_DEFAULT;
+  PERFS=PERFS||PERFS_DEFAULT;
+  const inpStyle={padding:"6px 8px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)"};
+  return React.createElement("div",null,
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{className:"stl"},"Dados do atendimento"),
+      React.createElement("div",{className:"fg",style:{marginBottom:14}},
+        React.createElement("label",null,"Cliente"),
+        React.createElement("select",{value:ns.cid,onChange:e=>setN("cid",e.target.value),style:{...inpStyle,width:"100%",padding:"8px 10px"}},
+          React.createElement("option",{value:""},"— Selecionar cliente (opcional) —"),
+          cls.map(c=>React.createElement("option",{key:c.id,value:c.id},c.nm+" • "+FMT(c.ph)))
+        )
+      ),
+      React.createElement("div",{className:"fgrid g2"},
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Tipo"),React.createElement("select",{value:ns.tp,onChange:e=>setN("tp",e.target.value),style:{...inpStyle,width:"100%",padding:"8px 10px"}},["Piercing","Consulta","Retorno","Limpeza","Limpeza de Joia","Troca de Joia","Outro"].map(t=>React.createElement("option",{key:t,value:t},t)))),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Data"),React.createElement("input",{type:"date",value:ns.dt,onChange:e=>setN("dt",e.target.value),style:{...inpStyle,width:"100%",padding:"8px 10px"}})),
+        React.createElement("div",{className:"fg full"},React.createElement("label",null,"Preço cobrado (R$)"),React.createElement("input",{type:"number",step:".01",placeholder:"0,00",value:ns.pr,onChange:e=>setN("pr",e.target.value),style:{...inpStyle,width:"100%",padding:"8px 10px"}})),
+        React.createElement("div",{className:"fg full"},
+          React.createElement("label",null,"Colaborador (opcional)"),
+          React.createElement("select",{value:ns.colabId,onChange:e=>setN("colabId",e.target.value),style:{...inpStyle,width:"100%",padding:"8px 10px"}},
+            React.createElement("option",{value:""},"— Sem colaborador —"),
+            (colabs||[]).map(c=>React.createElement("option",{key:c.id,value:c.id},c.nome+" — "+c.pct+"% de comissão"))
+          ),
+          ns.colabId&&(()=>{const _cb=(colabs||[]).find(c=>c.id===parseInt(ns.colabId));const _pr=parseFloat(ns.pr)||0;const _cc=_cb&&_pr>0?_pr*(parseFloat(_cb.pct)||0)/100:0;return _cc>0?React.createElement("div",{style:{fontSize:12,color:"var(--amber)",marginTop:4}},"Comissão: "+R(_cc)+" ("+_cb.pct+"% de "+R(_pr)+")"):null;})()
+        )
+      ),
+      React.createElement("div",null,
+        React.createElement("label",{style:{fontSize:12,color:"var(--text2)",fontWeight:600,display:"block",marginBottom:8}},"Forma de pagamento (opcional — pode definir depois)"),
+        React.createElement("div",{className:"pms"},FP.map(f=>React.createElement("button",{key:f.id,className:"pmb"+(ns.fp===f.id?" sel":""),onClick:()=>setN("fp",ns.fp===f.id?"":f.id)},React.createElement("span",{className:"pmico"},f.ico),f.label)))
+      )
+    ),
+
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
+        React.createElement("div",{className:"stl",style:{marginBottom:0}},"💎 Joias / Itens ("+(ns.joias||[]).length+"/10)"),
+        (ns.joias||[]).length<10&&jcat.length>0&&React.createElement("select",{
+          value:"",onChange:e=>{if(e.target.value)addJ(parseInt(e.target.value));},
+          style:{...inpStyle,padding:"5px 8px",fontSize:12,maxWidth:220}},
+          React.createElement("option",{value:""},"+ Adicionar joia do catálogo"),
+          jcat.filter(j=>j.st>0).map(j=>React.createElement("option",{key:j.id,value:j.id},j.nome+" — "+R(j.preco)+" (est: "+j.st+")"))
+        ),
+        jcat.length===0&&React.createElement("span",{style:{fontSize:12,color:"var(--text2)"}},"Cadastre joias na aba 💎 Joias")
+      ),
+      (ns.joias||[]).length===0&&React.createElement("div",{style:{fontSize:13,color:"var(--text2)",padding:"8px 0"}},"Nenhuma joia selecionada."),
+      (ns.joias||[]).map((j,i)=>{
+        const jItem=jcat.find(x=>x.id===j.jid);
+        const ss={padding:"6px 8px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg)",color:"var(--text)",width:"100%"};
+        return React.createElement("div",{key:i,style:{marginBottom:10,padding:"11px 13px",background:"var(--bg2)",borderRadius:"var(--radius)",border:".5px solid var(--border)"}},
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:10}},
+            jItem?.foto&&React.createElement("img",{src:jItem.foto,alt:j.desc,style:{width:34,height:34,objectFit:"cover",borderRadius:4,flexShrink:0}}),
+            React.createElement("div",{style:{flex:1}},
+              React.createElement("div",{style:{fontWeight:600,fontSize:13}},j.desc),
+              React.createElement("div",{style:{fontSize:12,color:"var(--text2)"}},R(j.val))
+            ),
+            React.createElement("button",{className:"btn bd bs",style:{padding:"3px 8px"},onClick:()=>delJ(i)},"\u00D7")
+          ),
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"var(--text2)",marginBottom:4,textTransform:"uppercase",letterSpacing:".04em"}},"Local"),
+              React.createElement("select",{value:j.local||"",onChange:e=>upJ(i,"local",e.target.value),style:ss},
+                React.createElement("option",{value:""},"— Selecionar local —"),
+                LOCAIS.map(l=>React.createElement("option",{key:l,value:l},l))
+              )
+            ),
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"var(--text2)",marginBottom:4,textTransform:"uppercase",letterSpacing:".04em"}},"Perfuração"),
+              React.createElement("select",{value:j.perf||"",onChange:e=>upJ(i,"perf",e.target.value),style:ss},
+                React.createElement("option",{value:""},"— Selecionar perfuração —"),
+                PERFS.map(p=>React.createElement("option",{key:p,value:p},p))
+              )
+            )
+          )
+        );
+      })
+    ),
+
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{className:"stl"},"Insumos utilizados"),
+      ns.ins.map((row,i)=>{const p=ps.find(x=>x.id===parseInt(row.pid));return React.createElement("div",{key:i,className:"sr"},React.createElement("select",{value:row.pid,onChange:e=>upR(i,"pid",e.target.value),style:{...inpStyle}},ps.map(p=>React.createElement("option",{key:p.id,value:p.id},p.nome+" ("+R(p.vu)+")"))),React.createElement("input",{type:"number",min:1,value:row.q,onChange:e=>upR(i,"q",e.target.value),placeholder:"Qtd",style:{...inpStyle}}),React.createElement("span",{className:"srv",style:{fontSize:12,color:"var(--text2)",textAlign:"right"}},p?R(p.vu*(parseInt(row.q)||0)):""),React.createElement("button",{className:"btn bd bs",style:{padding:"5px 8px"},onClick:()=>delR(i)},"\u00D7"));}),
+      React.createElement("button",{className:"btn bs",style:{marginBottom:16},onClick:addR},"+ Adicionar insumo"),
+      React.createElement("div",{className:"cbox"},
+        React.createElement("div",{className:"stl",style:{marginBottom:8}},"Resumo"),
+        React.createElement("div",{className:"cr"},React.createElement("span",null,"Insumos"),React.createElement("span",null,R(pv.ci))),
+        (ns.joias||[]).filter(j=>parseFloat(j.val)>0).map((j,i)=>{const loc=[j.perf,j.local].filter(Boolean).join(" / ");return React.createElement("div",{key:i,className:"cr"},React.createElement("span",{style:{color:"var(--text2)"}},(j.desc||"Joia "+(i+1))+(loc?" • "+loc:"")),React.createElement("span",null,R(parseFloat(j.val)||0)));}),
+        pv.cc>0&&React.createElement("div",{className:"cr"},React.createElement("span",{style:{color:"var(--amber)"}},"Comissão ("+pv.cbNome+")"),React.createElement("span",{style:{color:"var(--amber)"}},R(pv.cc))),React.createElement("div",{className:"cr tot"},React.createElement("span",null,"Custo total"),React.createElement("span",null,R(pv.ct)))
+      ),
+      pv.p>0&&React.createElement("div",{style:{background:pv.l>=0?"var(--gbg)":"var(--rbg)",borderRadius:"var(--radius)",padding:14,marginBottom:16}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},React.createElement("span",{style:{fontWeight:700}},"Lucro estimado"),React.createElement("span",{style:{fontWeight:700,color:pv.l>=0?"var(--green)":"var(--red)"}},R(pv.l))),
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:8}},React.createElement("span",{style:{color:"var(--text2)"}},"Margem"),React.createElement("span",{style:{fontWeight:700,color:pv.l>=0?"var(--green)":"var(--red)"}},P(pv.m))),
+        React.createElement("div",{className:"mbar",style:{marginBottom:0}},React.createElement("div",{className:"mfill",style:{width:Math.min(100,Math.max(0,pv.m))+"%",background:pv.l>=0?"var(--green)":"var(--red)"}}))
+      ),
+      React.createElement("button",{className:"btn bp",onClick:saveSvc},"Salvar atendimento")
+    )
+  );
+}
+
+
+/* ─────────────────── JOIAS / ITENS ─────────────────── */
+function JoiasTab({jcat,setJcat}){
+  const E={nome:"",preco:"",st:"",foto:null};
+  const[form,setForm]=useState(E);const[show,setShow]=useState(false);const[ed,setEd]=useState({});
+  const[posEdit,setPosEdit]=useState({});
+
+  function add(){
+    if(!form.nome.trim()||!form.preco)return;
+    const preco=parseFloat(form.preco)||0,st=parseInt(form.st)||1;
+    setJcat(j=>[...j,{id:Date.now(),nome:form.nome.toUpperCase().trim(),preco,st,foto:form.foto||null}]);
+    setForm(E);setShow(false);
+  }
+
+  function uploadFoto(id,file){
+    if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const b64=ev.target.result;
+      if(id==="form"){setForm(f=>({...f,foto:b64}));}
+      else{setJcat(jc=>jc.map(x=>x.id===id?{...x,foto:b64}:x));}
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const stE=j=>setEd(e=>({...e,[j.id]:{preco:j.preco,st:j.st,nome:j.nome}}));
+  function svE(j){
+    const e=ed[j.id];if(!e)return;
+    const preco=parseFloat(e.preco)||0,st=parseInt(e.st)||0;
+    setJcat(prev=>prev.map(x=>x.id===j.id?{...x,nome:(e.nome||j.nome).toUpperCase().trim(),preco,st}:x));
+    setEd(e=>{const n={...e};delete n[j.id];return n;});
+  }
+  const cE=id=>setEd(e=>{const n={...e};delete n[id];return n;});
+  const upE=(id,f,v)=>setEd(e=>({...e,[id]:{...e[id],[f]:v}}));
+
+  function moveUp(idx){if(idx===0)return;setJcat(arr=>{const a=[...arr];[a[idx-1],a[idx]]=[a[idx],a[idx-1]];return a;});}
+  function moveDn(idx){setJcat(arr=>{if(idx>=arr.length-1)return arr;const a=[...arr];[a[idx],a[idx+1]]=[a[idx+1],a[idx]];return a;});}
+  function moveTo(id,idx,rawVal){
+    const dest=parseInt(rawVal);if(isNaN(dest))return;
+    const clamp=Math.min(Math.max(dest,1),jcat.length)-1;
+    setJcat(arr=>{const a=[...arr];const[item]=a.splice(idx,1);a.splice(clamp,0,item);return a;});
+    setPosEdit(p=>{const n={...p};delete n[id];return n;});
+  }
+
+  const inp={padding:"8px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",width:"100%"};
+
+  return React.createElement("div",null,
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
+      React.createElement("span",{style:{fontSize:13,color:"var(--text2)"}},jcat.length+" joia(s) cadastrada(s)"),
+      React.createElement("button",{className:"btn bp bs",onClick:()=>setShow(s=>!s)},show?"✕ Cancelar":"+ Nova joia")
+    ),
+
+    show&&React.createElement("div",{className:"card",style:{marginBottom:14}},
+      React.createElement("div",{className:"stl"},"Cadastrar joia / item"),
+      React.createElement("div",{className:"fgrid g2"},
+        React.createElement("div",{className:"fg full"},React.createElement("label",null,"Nome"),React.createElement("input",{type:"text",placeholder:"Ex: Argola Titanio G16",value:form.nome,onChange:e=>setForm(f=>({...f,nome:e.target.value})),style:inp})),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Preço de custo (R$)"),React.createElement("input",{type:"number",step:".01",placeholder:"0,00",value:form.preco,onChange:e=>setForm(f=>({...f,preco:e.target.value})),style:inp})),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Estoque inicial"),React.createElement("input",{type:"number",min:0,placeholder:"1",value:form.st,onChange:e=>setForm(f=>({...f,st:e.target.value})),style:inp}))
+      ),
+      React.createElement("div",{style:{marginBottom:14}},
+        React.createElement("label",{style:{fontSize:12,color:"var(--text2)",fontWeight:600,display:"block",marginBottom:6}},"Foto (opcional)"),
+        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+          form.foto&&React.createElement("img",{src:form.foto,alt:"preview",style:{width:56,height:56,objectFit:"cover",borderRadius:"var(--radius)",border:".5px solid var(--border2)"}}),
+          React.createElement("label",{className:"btn bs",style:{cursor:"pointer"}},
+            "📷 "+(form.foto?"Trocar foto":"Escolher foto"),
+            React.createElement("input",{type:"file",accept:"image/*",style:{display:"none"},onChange:e=>uploadFoto("form",e.target.files[0])})
+          ),
+          form.foto&&React.createElement("button",{className:"btn bd bs",onClick:()=>setForm(f=>({...f,foto:null}))},"Remover foto")
+        )
+      ),
+      React.createElement("button",{className:"btn bp",onClick:add},"Cadastrar joia")
+    ),
+
+    jcat.length===0&&!show&&React.createElement("div",{className:"empty"},"Nenhuma joia cadastrada."),
+
+    jcat.length>0&&React.createElement("div",{className:"card",style:{padding:0,overflow:"hidden"}},
+      React.createElement("div",{className:"scr"},React.createElement("table",null,
+        React.createElement("thead",null,React.createElement("tr",null,
+          ["Pos.","Foto","Nome","Custo","Estoque","Status",""].map(h=>React.createElement("th",{key:h,style:{padding:"10px 12px"}},h))
+        )),
+        React.createElement("tbody",null,jcat.map((j,idx)=>{
+          const e=ed[j.id];
+          const sc=j.st>5?"ok":j.st>0?"lw":"no";const sl={ok:"Normal",lw:"Baixo",no:"Zerado"};
+          const posDraft=posEdit[j.id]!=null?posEdit[j.id]:String(idx+1);
+          return React.createElement("tr",{key:j.id},
+            /* pos */
+            React.createElement("td",{style:{padding:"7px 8px",whiteSpace:"nowrap"}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:4}},
+                React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:1}},
+                  React.createElement("button",{className:"btn bs",style:{padding:"1px 5px",fontSize:10,lineHeight:1.2},disabled:idx===0,onClick:()=>moveUp(idx)},"\u25B2"),
+                  React.createElement("button",{className:"btn bs",style:{padding:"1px 5px",fontSize:10,lineHeight:1.2},disabled:idx===jcat.length-1,onClick:()=>moveDn(idx)},"\u25BC")
+                ),
+                React.createElement("input",{type:"number",min:1,max:jcat.length,value:posDraft,
+                  style:{width:40,padding:"4px 5px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg)",color:"var(--text)",textAlign:"center"},
+                  onChange:ev=>setPosEdit(p=>({...p,[j.id]:ev.target.value})),
+                  onBlur:ev=>moveTo(j.id,idx,ev.target.value),
+                  onKeyDown:ev=>{if(ev.key==="Enter")moveTo(j.id,idx,ev.target.value);}
+                })
+              )
+            ),
+            /* foto */
+            React.createElement("td",{style:{padding:"6px 10px"}},
+              React.createElement("label",{style:{cursor:"pointer",display:"block"}},
+                j.foto
+                  ?React.createElement("img",{src:j.foto,alt:j.nome,style:{width:44,height:44,objectFit:"cover",borderRadius:6,border:".5px solid var(--border2)",display:"block"}})
+                  :React.createElement("div",{style:{width:44,height:44,borderRadius:6,border:"1px dashed var(--border2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"var(--text3)"}},"\u{1F4F7}"),
+                React.createElement("input",{type:"file",accept:"image/*",style:{display:"none"},onChange:ev=>uploadFoto(j.id,ev.target.files[0])})
+              )
+            ),
+            /* nome */
+            React.createElement("td",{style:{fontWeight:600,padding:"7px 12px"}},
+              e?React.createElement("input",{type:"text",value:e.nome,onChange:ev=>upE(j.id,"nome",ev.target.value),className:"td-i",style:{width:160}}):j.nome
+            ),
+            /* custo */
+            React.createElement("td",{style:{padding:"7px 12px"}},
+              e?React.createElement("input",{type:"number",step:".01",value:e.preco,onChange:ev=>upE(j.id,"preco",ev.target.value),className:"td-i",style:{width:90}}):R(j.preco)
+            ),
+            /* estoque */
+            React.createElement("td",{style:{padding:"7px 12px"}},
+              e?React.createElement("input",{type:"number",min:0,value:e.st,onChange:ev=>upE(j.id,"st",ev.target.value),className:"td-i",style:{width:72}}):j.st
+            ),
+            /* status */
+            React.createElement("td",{style:{padding:"7px 12px"}},React.createElement("span",{className:"bx "+sc},sl[sc])),
+            /* ações */
+            React.createElement("td",{style:{whiteSpace:"nowrap",padding:"7px 12px"}},
+              e?React.createElement("div",{style:{display:"flex",gap:5}},
+                React.createElement("button",{className:"btn bp bs",onClick:()=>svE(j)},"Salvar"),
+                React.createElement("button",{className:"btn bs",onClick:()=>cE(j.id)},"Cancelar")
+              ):React.createElement("div",{style:{display:"flex",gap:5}},
+                React.createElement("button",{className:"btn bs",onClick:()=>stE(j)},"Editar"),
+                React.createElement("button",{className:"btn bd bs",onClick:()=>setJcat(prev=>prev.filter(x=>x.id!==j.id))},"Remover")
+              )
+            )
+          );
+        }))
+      ))
+    )
+  );
+}
+
+
+/* ─────────────────── AGEND. RETORNO ─────────────────── */
+function Retorno({svcs,cls,jcat,retMsgTpl,setRetMsgTpl}){
+  const[editTpl,setEditTpl]=useState(false);
+  const[tplDraft,setTplDraft]=useState(retMsgTpl);
+  const[tplSaved,setTplSaved]=useState(false);
+  const[retEnviada,setRetEnviada]=useLS("retEnviada",{});
+  const[sortMode,setSortMode]=useState("urgente");// urgente | antigo | novo
+  // per-card editable msg: {[svcId]: string}
+  const[cardMsg,setCardMsg]=useLS("cardMsg",{});
+
+  const today=new Date();today.setHours(0,0,0,0);
+  function addDays(dateStr,n){const d=new Date(dateStr+"T00:00:00");d.setDate(d.getDate()+n);return d;}
+  function fmtRetDate(dateStr){const d=addDays(dateStr,25);return D(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"));}
+  function diffDays(dateStr){return Math.round((addDays(dateStr,25)-today)/(1000*60*60*24));}
+
+  // Build joias line for a service
+  function joiasLine(s){
+    const list=(s.joias||[]).filter(j=>j.val>0);
+    if(!list.length)return "";
+    return "\n\n*Joias implantadas:*\n"+list.map(j=>"• "+joiaDetalhe(j)).join("\n");
+  }
+
+  // Build the base message (template variables only), NO joias yet
+  function baseMsg(cl,s){
+    const tpl=cl.retMsg&&cl.retMsg.trim()?cl.retMsg:retMsgTpl;
+    return tpl
+      .replace(/{nome}/g,cl.nm)
+      .replace(/{procedimento}/g,s.tp)
+      .replace(/{data}/g,D(s.dt))
+      .replace(/{joias}/g,joiasLine(s));
+  }
+
+  // Get the editable msg for a card (initialised from baseMsg if not yet customised)
+  function getCardMsg(cl,s){
+    return cardMsg[s.id]!==undefined ? cardMsg[s.id] : baseMsg(cl,s)+joiasLine(s);
+  }
+
+  function initCardMsg(cl,s){
+    if(cardMsg[s.id]===undefined){
+      setCardMsg({...cardMsg,[s.id]:baseMsg(cl,s)+joiasLine(s)});
+    }
+  }
+
+  function enviarWA(cl,s){
+    const msg=getCardMsg(cl,s);
+    const n=cl.ph.replace(/\D/g,"");
+    const num=n.startsWith("55")?n:"55"+n;
+    if(navigator.clipboard){navigator.clipboard.writeText(msg).catch(()=>{});}
+    window.open("https://wa.me/"+num+"?text="+encodeURIComponent(msg),"_blank");
+    setRetEnviada({...retEnviada,[s.id]:true});
+  }
+
+  function desfazEnvio(sid){const n={...retEnviada};delete n[sid];setRetEnviada(n);}
+  function resetCardMsg(cl,s){setCardMsg({...cardMsg,[s.id]:baseMsg(cl,s)+joiasLine(s)});}
+
+  const retornos=svcs
+    .filter(s=>s.cid)
+    .map(s=>{
+      const cl=cls.find(c=>c.id===s.cid);
+      if(!cl)return null;
+      const diff=diffDays(s.dt);
+      return{s,cl,diff,retDate:fmtRetDate(s.dt)};
+    })
+    .filter(Boolean)
+    .sort((a,b)=>{
+      if(sortMode==="antigo")return a.s.dt<b.s.dt?-1:a.s.dt>b.s.dt?1:0;
+      if(sortMode==="novo")return a.s.dt<b.s.dt?1:a.s.dt>b.s.dt?-1:0;
+      return a.diff-b.diff;// urgente
+    });
+
+  const pendentes=retornos.filter(r=>r.diff>0&&r.diff<=30);
+  const vencidos=retornos.filter(r=>r.diff<=0&&r.diff>=-7);
+  const futuros=retornos.filter(r=>r.diff>30);
+
+  function Card({r}){
+    const urgente=r.diff<=3&&r.diff>=0;
+    const venc=r.diff<0;
+    const enviada=!!retEnviada[r.s.id];
+    const msg=getCardMsg(r.cl,r.s);
+
+    return React.createElement("div",{style:{border:".5px solid "+(venc?"var(--red)":urgente?"var(--amber)":"var(--border)"),borderRadius:"var(--radius)",padding:"13px 15px",marginBottom:10,background:"var(--bg)"}},
+      /* ─ header ─ */
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4,flexWrap:"wrap",gap:6}},
+        React.createElement("div",null,
+          React.createElement("span",{style:{fontWeight:700,marginRight:6}},r.cl.nm),
+          React.createElement("span",{className:"bx ok",style:{marginRight:4}},r.s.tp),
+          React.createElement("span",{className:"bx "+(venc?"no":urgente?"lw":"ok")},venc?"Vencido há "+Math.abs(r.diff)+"d":r.diff===0?"Hoje!":r.diff+"d restantes")
+        ),
+        React.createElement("div",{style:{fontSize:12,color:"var(--text2)"}},
+          "Retorno: ",React.createElement("strong",null,r.retDate)
+        )
+      ),
+      React.createElement("div",{style:{fontSize:12,color:"var(--text2)",marginBottom:10}},D(r.s.dt)+" • "+FMT(r.cl.ph)),
+
+      /* ─ joias usadas ─ */
+      (r.s.joias||[]).filter(j=>j.val>0).length>0&&React.createElement("div",{style:{background:"var(--bg2)",borderRadius:"var(--radius)",padding:"7px 10px",marginBottom:10,fontSize:12}},
+        React.createElement("span",{style:{fontWeight:600,marginRight:4}},"💎 Joias do atendimento:"),
+        (r.s.joias||[]).filter(j=>j.val>0).map(j=>joiaDetalhe(j)).join(" • ")
+      ),
+
+      /* ─ msg editável ─ */
+      React.createElement("div",{style:{marginBottom:8}},
+        React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:5}},"Mensagem — edite antes de enviar"),
+        React.createElement("textarea",{
+          value:msg,
+          rows:6,
+          onFocus:()=>initCardMsg(r.cl,r.s),
+          onChange:e=>setCardMsg({...cardMsg,[r.s.id]:e.target.value}),
+          style:{width:"100%",padding:"9px 11px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg2)",color:"var(--text)",resize:"vertical",fontFamily:"inherit",lineHeight:1.6}
+        }),
+        React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",marginTop:4}},
+          React.createElement("button",{className:"btn bs",style:{fontSize:11},onClick:()=>resetCardMsg(r.cl,r.s)},"↺ Restaurar padrão")
+        )
+      ),
+
+      /* ─ ações ─ */
+      enviada
+        ?React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+            React.createElement("span",{className:"msg-sent"},"✓ Lembrete enviado"),
+            React.createElement("button",{className:"btn bd bs",onClick:()=>desfazEnvio(r.s.id)},"↩ Desfazer")
+          )
+        :React.createElement("button",{className:"bwa",style:{fontSize:13,padding:"9px 16px",width:"100%",justifyContent:"center"},onClick:()=>enviarWA(r.cl,r.s)},"📲 Enviar lembrete de retorno")
+    );
+  }
+
+  return React.createElement("div",null,
+    /* ─ filtro de ordenação ─ */
+    React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center",marginBottom:12,flexWrap:"wrap"}},
+      React.createElement("span",{style:{fontSize:12,fontWeight:600,color:"var(--text2)"}},"Ordenar:"),
+      [["urgente","Mais urgente primeiro"],["antigo","Mais antigo primeiro"],["novo","Mais novo primeiro"]].map(([k,label])=>
+        React.createElement("button",{key:k,className:"btn bs"+(sortMode===k?" bp":""),style:{fontSize:12},onClick:()=>setSortMode(k)},label)
+      )
+    ),
+    /* template padrão */
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:editTpl?12:0}},
+        React.createElement("div",null,
+          React.createElement("div",{className:"stl",style:{marginBottom:2}},"Mensagem padrão de retorno"),
+          React.createElement("div",{style:{fontSize:11,color:"var(--text2)"}},"Variáveis: {nome} {procedimento} {data} {joias}")
+        ),
+        React.createElement("button",{className:"btn bs",onClick:()=>setEditTpl(e=>!e)},editTpl?"Fechar":"Editar padrão")
+      ),
+      editTpl&&React.createElement("div",{style:{marginTop:10}},
+        React.createElement("textarea",{value:tplDraft,onChange:e=>setTplDraft(e.target.value),rows:5,style:{width:"100%",padding:"9px 11px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",resize:"vertical",fontFamily:"monospace",lineHeight:1.6,marginBottom:8}}),
+        React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+          React.createElement("button",{className:"btn bp",onClick:()=>{setRetMsgTpl(tplDraft);setTplSaved(true);setTimeout(()=>setTplSaved(false),2000);}},"Salvar padrão"),
+          tplSaved&&React.createElement("span",{className:"alert-ok"},"✓ Salvo!")
+        )
+      )
+    ),
+
+    vencidos.length>0&&React.createElement("div",null,
+      React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--red)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:8}},"⚠️ Retorno vencido (últimos 7 dias)"),
+      vencidos.map(r=>React.createElement(Card,{key:r.s.id,r}))
+    ),
+    pendentes.length>0&&React.createElement("div",null,
+      React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--amber)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:8,marginTop:vencidos.length?14:0}},"📅 Retorno nos próximos 30 dias"),
+      pendentes.map(r=>React.createElement(Card,{key:r.s.id,r}))
+    ),
+    futuros.length>0&&React.createElement("div",null,
+      React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:8,marginTop:(vencidos.length||pendentes.length)?14:0}},"📆 Retornos futuros (+30 dias)"),
+      futuros.map(r=>React.createElement(Card,{key:r.s.id,r}))
+    ),
+    !retornos.length&&React.createElement("div",{className:"empty"},"Nenhum retorno agendado. Cadastre atendimentos com clientes vinculados para ver os lembretes aqui.")
+  );
+}
+
+/* ─────────────────── HISTÓRICO ─────────────────── */
+function Hist({svcs,ps,cls,setSvcs,marcarPago,marcarPend,msgTpl,ac,marcarMsgEnviada,colabs,canDelete,canFinancials,canEdit}){
+  const[po,setPo]=useState({});const[sf,setSf]=useState({});const[exp,setExp]=useState({});
+  const[cardMsg,setCardMsg]=useLS("histCardMsg",{});
+  const[confirmDel,setConfirmDel]=useState(null);// svcId to delete
+  const[escamboDesc,setEscamboDesc]=useState({});
+  const togExp=(id,k)=>setExp(e=>({...e,[id+k]:!e[id+k]}));
+  const tog=id=>{setPo(p=>({...p,[id]:!p[id]}));setSf(f=>({...f,[id]:""}));setEscamboDesc(e=>({...e,[id]:""}));};
+  function cfm(s){const fp=sf[s.id]||s.fp||"";marcarPago(s.id,fp,escamboDesc[s.id]||"");setPo(p=>({...p,[s.id]:false}));}
+
+  function getCardMsg(cl,s){
+    return cardMsg[s.id]!==undefined?cardMsg[s.id]:buildMsg(msgTpl,cl,s,ac);
+  }
+  function initCardMsg(cl,s){
+    if(cardMsg[s.id]===undefined) setCardMsg({...cardMsg,[s.id]:buildMsg(msgTpl,cl,s,ac)});
+  }
+  function resetCardMsg(cl,s){setCardMsg({...cardMsg,[s.id]:buildMsg(msgTpl,cl,s,ac)});}
+
+  function enviarWA(cl,s){
+    const msg=getCardMsg(cl,s);
+    const n=cl.ph.replace(/\D/g,"");
+    const num=n.startsWith("55")?n:"55"+n;
+    if(navigator.clipboard){navigator.clipboard.writeText(msg).catch(()=>{});}
+    window.open("https://wa.me/"+num+"?text="+encodeURIComponent(msg),"_blank");
+    marcarMsgEnviada(s.id);
+  }
+
+  if(!svcs.length)return React.createElement("div",{className:"empty"},"Nenhum atendimento registrado.");
+
+
+  return React.createElement("div",null,
+    confirmDel&&React.createElement(ConfirmDelete,{onConfirm:()=>{setSvcs(p=>p.filter(x=>x.id!==confirmDel));setConfirmDel(null);},onCancel:()=>setConfirmDel(null)}),
+    svcs.map(s=>{
+    const{ci,ct,l,m,cc,cbNome}=calc(s,ps,colabs);const[y,mo,d]=s.dt.split("-");
+    const cl=s.cid?cls.find(c=>c.id===s.cid):null;
+    const fpo=FPM[s.fp];const pan=!!po[s.id];const csfp=sf[s.id]||"";
+    const msgTxt=cl?getCardMsg(cl,s):"";
+
+    return React.createElement("div",{key:s.id,className:"hcard"+(s.pg?" paid":"")},
+
+      /* ── Header ── */
+      React.createElement("div",{className:"hh"},
+        React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:5,alignItems:"center"}},
+          React.createElement("span",{style:{fontWeight:700,fontSize:14}},s.tp),
+          React.createElement("span",{className:"bx ok"},d+"/"+mo+"/"+y),
+          React.createElement("span",{className:"bx "+(s.pg?"ok":"lw")},s.pg?"✓ PAGO":"PENDENTE"),
+          s.pg&&fpo&&React.createElement("span",{className:"bx "+fpo.cls},fpo.ico+" "+fpo.label)
+        ),
+        React.createElement("button",{className:"btn bd bs",style:{padding:"4px 8px"},onClick:()=>setConfirmDel(s.id)},"\u00D7")
+      ),
+
+      cl&&React.createElement("div",{style:{fontSize:12,color:"var(--text2)",marginBottom:8}},"\u{1F464} "+cl.nm+" • "+FMT(cl.ph)),
+
+      /* ── Números ── */
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,marginBottom:8}},
+        [...([["Receita",R(s.pr),null],["Insumos",R(ci),"ins"],["Joias",R(totalJoias(s)),"joi"],["Custo",R(ct),null]]),...(cc>0?[["Comissão",R(cc)+" ("+cbNome+")",null]]:[])].map(([lb,v,key])=>
+          React.createElement("div",{key:lb,style:{textAlign:"center",padding:"6px 4px",background:"var(--bg2)",borderRadius:"var(--radius)",cursor:key?"pointer":"default",border:key&&exp[s.id+key]?".5px solid var(--green)":".5px solid transparent"},onClick:key?()=>togExp(s.id,key):undefined},
+            React.createElement("div",{style:{fontSize:11,color:"var(--text2)"}},lb+(key?" ▾":"")),
+            React.createElement("div",{style:{fontSize:12,fontWeight:700}},v)
+          )
+        )
+      ),
+
+      exp[s.id+"joi"]&&(s.joias||[]).length>0&&React.createElement("div",{style:{background:"var(--bg2)",borderRadius:"var(--radius)",padding:"10px 12px",marginBottom:8,fontSize:12}},
+        React.createElement("div",{style:{fontWeight:700,marginBottom:6,color:"var(--text2)",fontSize:11,textTransform:"uppercase",letterSpacing:".04em"}},"💎 Joias utilizadas"),
+        (s.joias||[]).map((j,i)=>React.createElement("div",{key:i,style:{display:"flex",justifyContent:"space-between",padding:"3px 0",borderBottom:i<(s.joias.length-1)?".5px solid var(--border)":"none"}},React.createElement("span",null,joiaDetalhe(j)),React.createElement("span",{style:{fontWeight:600}},R(j.val||0))))
+      ),
+      exp[s.id+"ins"]&&s.ins.length>0&&React.createElement("div",{style:{background:"var(--bg2)",borderRadius:"var(--radius)",padding:"10px 12px",marginBottom:8,fontSize:12}},
+        React.createElement("div",{style:{fontWeight:700,marginBottom:6,color:"var(--text2)",fontSize:11,textTransform:"uppercase",letterSpacing:".04em"}},"🧴 Insumos utilizados"),
+        s.ins.map((ins,i)=>{const p=ps.find(p=>p.id===ins.pid);return React.createElement("div",{key:i,style:{display:"flex",justifyContent:"space-between",padding:"3px 0",borderBottom:i<(s.ins.length-1)?".5px solid var(--border)":"none"}},React.createElement("span",null,(p?p.nome:"#"+ins.pid)+" × "+ins.q),React.createElement("span",{style:{fontWeight:600}},p?R(p.vu*ins.q):"—"));})
+      ),
+
+      canFinancials&&React.createElement("div",{style:{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:6}},React.createElement("span",{style:{color:l>=0?"var(--green)":"var(--red)",fontWeight:700}},"Lucro: "+R(l)),React.createElement("span",{style:{color:l>=0?"var(--green)":"var(--red)"}},P(m)+" margem")),
+      canFinancials&&React.createElement("div",{className:"mbar"},React.createElement("div",{className:"mfill",style:{width:Math.min(100,Math.max(0,m))+"%",background:l>=0?"var(--green)":"var(--red)"}})),
+
+      /* ── Painel de pagamento ── */
+      !s.pg&&pan&&React.createElement("div",{className:"pp"},
+        React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"var(--text2)",marginBottom:10,textTransform:"uppercase",letterSpacing:".05em"}},"Forma de pagamento"),
+        React.createElement("div",{className:"pms"},FP.map(f=>React.createElement("button",{key:f.id,className:"pmb"+(csfp===f.id?" sel":""),onClick:()=>setSf(p=>({...p,[s.id]:f.id}))},React.createElement("span",{className:"pmico"},f.ico),f.label))),
+        csfp==="escambo"&&React.createElement("div",{style:{marginTop:10}},
+          React.createElement("label",{style:{fontSize:12,fontWeight:600,color:"var(--text2)",display:"block",marginBottom:4}},"O que foi trocado? (descreva)"),
+          React.createElement("textarea",{rows:3,placeholder:"Ex: 2 frascos de soro fisiológico + 1 caixa de luvas...",value:escamboDesc[s.id]||"",onChange:e=>setEscamboDesc(d=>({...d,[s.id]:e.target.value})),style:{width:"100%",padding:"8px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",resize:"vertical",fontFamily:"inherit",lineHeight:1.5}})
+        ),
+        React.createElement("div",{style:{display:"flex",gap:8}},
+          React.createElement("button",{className:"btn bp",style:{flex:1,fontSize:13},onClick:()=>cfm(s)},"✓ Confirmar"+(csfp?" — "+FPM[csfp]?.label:"")),
+          React.createElement("button",{className:"btn bs",onClick:()=>tog(s.id)},"Cancelar")
+        )
+      ),
+
+      /* ── Mensagem WhatsApp inline (só quando pago e tem cliente) ── */
+      s.pg&&cl&&React.createElement("div",{style:{marginTop:10,borderTop:".5px solid var(--border)",paddingTop:10}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
+          React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".05em"}},"Mensagem WhatsApp — edite antes de enviar"),
+          React.createElement("button",{className:"btn bs",style:{fontSize:11},onClick:()=>resetCardMsg(cl,s)},"↺ Restaurar padrão")
+        ),
+        React.createElement("textarea",{
+          value:msgTxt,rows:7,
+          onFocus:()=>initCardMsg(cl,s),
+          onChange:e=>setCardMsg({...cardMsg,[s.id]:e.target.value}),
+          style:{width:"100%",padding:"9px 11px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:12,background:"var(--bg2)",color:"var(--text)",resize:"vertical",fontFamily:"inherit",lineHeight:1.6,marginBottom:8}
+        }),
+        React.createElement("div",{className:"acts",style:{marginTop:0}},
+          !s.msgEnviada&&React.createElement("button",{className:"bwa",style:{flex:1,justifyContent:"center",fontSize:13,padding:"9px 16px"},onClick:()=>enviarWA(cl,s)},"📲 Enviar WhatsApp"),
+          s.msgEnviada&&React.createElement("span",{className:"msg-sent"},"✓ Mensagem enviada"),
+          s.msgEnviada&&React.createElement("button",{className:"btn bd bs",onClick:()=>marcarPend(s.id)||marcarMsgEnviada&&setSvcs(sv=>sv.map(x=>x.id===s.id?{...x,msgEnviada:false}:x))},"↩ Reenviar"),
+        )
+      ),
+
+      /* ── Ações quando pendente ── */
+      React.createElement("div",{className:"acts"},
+        !s.pg&&!pan&&React.createElement("button",{className:"btn bp",onClick:()=>tog(s.id)},"💳 Marcar como Pago"),
+        s.pg&&React.createElement("button",{className:"btn bs",style:{color:"var(--text2)"},onClick:()=>marcarPend(s.id)},"↩ Desfazer pagamento")
+      )
+    );
+  }));
+}
+
+/* ─────────────────── CONFIG ─────────────────── */
+const PROCS=["Piercing","Consulta","Retorno","Limpeza","Limpeza de Joia","Troca de Joia","Outro"];
+
+function BancoDados(){
+  const[cfg,setCfg]=useState(()=>{try{return JSON.parse(localStorage.getItem("sbConfig")||"null")||{url:"",key:""};}catch{return{url:"",key:""};} });
+  const[saved,setSaved]=useState(false);
+  const[testing,setTesting]=useState(false);
+  const[result,setResult]=useState(null);
+
+  function save(){
+    localStorage.setItem("sbConfig",JSON.stringify(cfg));
+    setSaved(true);setTimeout(()=>setSaved(false),2500);
+  }
+  function clear(){localStorage.removeItem("sbConfig");setCfg({url:"",key:""});}
+  async function test(){
+    setTesting(true);setResult(null);
+    try{
+      const r=await fetch(cfg.url+"/rest/v1/store?limit=1",{headers:{apikey:cfg.key,"Authorization":"Bearer "+cfg.key}});
+      setResult(r.ok?"ok":"erro: "+r.status+" "+r.statusText);
+    }catch(e){setResult("erro: "+e.message);}
+    setTesting(false);
+  }
+  async function sync(){
+    setTesting(true);setResult(null);
+    await _pushToDB();
+    setResult("ok");setTesting(false);
+  }
+  const inp={width:"100%",padding:"8px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",fontFamily:"inherit"};
+  return React.createElement("div",{className:"card"},
+    React.createElement("div",{className:"stl"},"Banco de Dados — Sincronização na Nuvem"),
+    React.createElement("p",{style:{fontSize:13,color:"var(--text2)",marginBottom:14,lineHeight:1.6}},"Dados sincronizados com Supabase. Altere as credenciais apenas se necessário."),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr",gap:8,marginBottom:10}},
+      React.createElement("div",{className:"fg"},
+        React.createElement("label",null,"Project URL"),
+        React.createElement("input",{type:"text",placeholder:"https://xxxx.supabase.co",value:cfg.url,onChange:e=>setCfg(c=>({...c,url:e.target.value.trim()})),style:inp})
+      ),
+      React.createElement("div",{className:"fg"},
+        React.createElement("label",null,"Anon public key"),
+        React.createElement("input",{type:"password",placeholder:"eyJh...",value:cfg.key,onChange:e=>setCfg(c=>({...c,key:e.target.value.trim()})),style:inp})
+      )
+    ),
+    React.createElement("div",{style:{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}},
+      React.createElement("button",{className:"btn bp",onClick:save,disabled:!cfg.url||!cfg.key},"Salvar"),
+      React.createElement("button",{className:"btn bs",onClick:test,disabled:testing||!cfg.url},"Testar conex\u00E3o"),
+      React.createElement("button",{className:"btn bs",onClick:sync,disabled:testing||!cfg.url},"Sincronizar agora"),
+      React.createElement("button",{className:"btn bd bs",onClick:clear},"Limpar"),
+      saved&&React.createElement("span",{className:"alert-ok"},"\u2713 Salvo!"),
+      result==="ok"&&React.createElement("span",{className:"alert-ok"},"\u2713 Conex\u00E3o OK"),
+      result&&result!=="ok"&&React.createElement("span",{style:{fontSize:12,color:"var(--red)"}},"\u2715 "+result)
+    )
+  );
+}
+
+function SenhaConfig(){
+  const[atual,setAtual]=useState("");
+  const[nova,setNova]=useState("");
+  const[conf,setConf]=useState("");
+  const[msg,setMsg]=useState(null);// {ok,txt}
+  const senha=localStorage.getItem("appSenha")||DEFAULT_SENHA;
+  function salvar(e){
+    e.preventDefault();
+    if(atual!==senha){setMsg({ok:false,txt:"Senha atual incorreta."});return;}
+    if(nova.length<4){setMsg({ok:false,txt:"A nova senha deve ter ao menos 4 caracteres."});return;}
+    if(nova!==conf){setMsg({ok:false,txt:"A confirmação não confere."});return;}
+    localStorage.setItem("appSenha",nova);
+    setAtual("");setNova("");setConf("");
+    setMsg({ok:true,txt:"Senha alterada com sucesso!"});
+    setTimeout(()=>setMsg(null),3000);
+  }
+  const inp={width:"100%",padding:"8px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",letterSpacing:2};
+  return React.createElement("div",null,
+    React.createElement("div",{className:"stl"},"Senha de acesso"),
+    React.createElement("p",{style:{fontSize:13,color:"var(--text2)",marginBottom:14}},"Senha padrão inicial: 1234"),
+    React.createElement("form",{onSubmit:salvar},
+      React.createElement("div",{className:"fgrid g2"},
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Senha atual"),React.createElement("input",{type:"password",placeholder:"••••",value:atual,onChange:e=>setAtual(e.target.value),style:inp})),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Nova senha"),React.createElement("input",{type:"password",placeholder:"••••",value:nova,onChange:e=>setNova(e.target.value),style:inp})),
+        React.createElement("div",{className:"fg"},React.createElement("label",null,"Confirmar nova senha"),React.createElement("input",{type:"password",placeholder:"••••",value:conf,onChange:e=>setConf(e.target.value),style:inp}))
+      ),
+      React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+        React.createElement("button",{type:"submit",className:"btn bp"},"Alterar senha"),
+        msg&&React.createElement("span",{style:{fontSize:12,color:msg.ok?"var(--green)":"var(--red)",fontWeight:600}},msg.ok?"✓ ":"✗ ",msg.txt)
+      )
+    )
+  );
+}
+
+/* ── CONTROLE DE ACESSOS ── */
+function AccessControl({permissions,setPermissions,myEmail}){
+  const ALL_TABS_AC=[["dash","Visão Geral"],["cls","Clientes"],["prods","Produtos"],["jcat","Joias"],["novo","Novo Atendimento"],["hist","Histórico"],["ret","Agend. Retorno"],["cfg","Config"]];
+  const BLANK={email:"",nome:"",isAdmin:false,tabs:["dash","cls","novo","hist","ret"],canDelete:false,canExport:false,canFinancials:true,canEdit:true,ativo:true};
+  const[form,setForm]=useState(BLANK);
+  const[adding,setAdding]=useState(false);
+  const[saved,setSaved]=useState(false);
+
+  function addUser(){
+    if(!form.email.trim())return;
+    const email=form.email.trim().toLowerCase();
+    if(permissions.find(p=>p.email===email)){alert("E-mail já cadastrado.");return;}
+    setPermissions([...permissions,{...form,email}]);
+    setForm(BLANK);setAdding(false);setSaved(true);setTimeout(()=>setSaved(false),2000);
+  }
+  function updateUser(idx,field,val){
+    setPermissions(permissions.map((p,i)=>i===idx?{...p,[field]:val}:p));
+  }
+  function toggleTab(idx,tabId){
+    const p=permissions[idx];
+    const tabs=p.tabs.includes(tabId)?p.tabs.filter(t=>t!==tabId):[...p.tabs,tabId];
+    updateUser(idx,"tabs",tabs);
+  }
+  function removeUser(idx){
+    if(permissions[idx].email===myEmail){alert("Não é possível remover seu próprio acesso.");return;}
+    if(!confirm("Remover este usuário?"))return;
+    setPermissions(permissions.filter((_,i)=>i!==idx));
+  }
+
+  const chk={width:14,height:14,cursor:"pointer",accentColor:"var(--green)"};
+  const badge=(on,label)=>React.createElement("span",{style:{fontSize:11,padding:"2px 7px",borderRadius:20,background:on?"var(--gbg)":"var(--bg2)",color:on?"var(--green)":"var(--text2)",fontWeight:600}},label);
+
+  return React.createElement("div",{className:"card"},
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
+      React.createElement("div",{className:"stl",style:{marginBottom:0}},"Controle de Acessos"),
+      React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+        saved&&React.createElement("span",{className:"alert-ok"},"\u2713 Salvo!"),
+        React.createElement("button",{className:"btn bp bs",onClick:()=>setAdding(a=>!a)},adding?"\u00D7 Cancelar":"+ Adicionar usu\u00E1rio")
+      )
+    ),
+
+    /* Formulário para novo usuário */
+    adding&&React.createElement("div",{style:{background:"var(--bg2)",borderRadius:"var(--radius)",padding:"14px 16px",marginBottom:14}},
+      React.createElement("div",{style:{fontWeight:600,fontSize:13,marginBottom:12}},"Novo usu\u00E1rio"),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}},
+        React.createElement("div",{className:"fg",style:{margin:0}},React.createElement("label",null,"E-mail"),React.createElement("input",{type:"email",placeholder:"usuario@email.com",value:form.email,onChange:e=>setForm(f=>({...f,email:e.target.value}))})),
+        React.createElement("div",{className:"fg",style:{margin:0}},React.createElement("label",null,"Nome"),React.createElement("input",{type:"text",placeholder:"Nome do colaborador",value:form.nome,onChange:e=>setForm(f=>({...f,nome:e.target.value}))}))
+      ),
+      React.createElement("div",{style:{marginBottom:10}},
+        React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"var(--text2)",marginBottom:8}},"ABAS VISÍVEIS"),
+        React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:6}},
+          ALL_TABS_AC.map(([id,label])=>React.createElement("label",{key:id,style:{display:"flex",alignItems:"center",gap:5,fontSize:12,cursor:"pointer",padding:"4px 8px",border:".5px solid var(--border2)",borderRadius:20,background:form.tabs.includes(id)?"var(--gbg)":"var(--bg)"}},
+            React.createElement("input",{type:"checkbox",checked:form.tabs.includes(id),onChange:()=>setForm(f=>({...f,tabs:f.tabs.includes(id)?f.tabs.filter(t=>t!==id):[...f.tabs,id]})),style:chk}),label
+          ))
+        )
+      ),
+      React.createElement("div",{style:{display:"flex",gap:16,marginBottom:12,flexWrap:"wrap"}},
+        [["isAdmin","Administrador"],["canFinancials","Ver financeiro"],["canDelete","Excluir atendimentos"],["canExport","Exportar dados"],["canEdit","Editar dados"]].map(([field,label])=>
+          React.createElement("label",{key:field,style:{display:"flex",alignItems:"center",gap:6,fontSize:12,cursor:"pointer"}},
+            React.createElement("input",{type:"checkbox",checked:!!form[field],onChange:e=>setForm(f=>({...f,[field]:e.target.checked})),style:chk}),label
+          )
+        )
+      ),
+      React.createElement("button",{className:"btn bp",onClick:addUser},"Adicionar usu\u00E1rio")
+    ),
+
+    /* Lista de usuários */
+    permissions.length===0&&React.createElement("div",{style:{fontSize:13,color:"var(--text2)",marginBottom:8}},"Nenhum usu\u00E1rio cadastrado. Ao adicionar o primeiro, apenas usu\u00E1rios desta lista poder\u00E3o acessar."),
+
+    permissions.map((p,idx)=>React.createElement("div",{key:p.email,style:{border:".5px solid var(--border)",borderRadius:"var(--radius)",padding:"12px 14px",marginBottom:10,background:"var(--bg)"}},
+      /* Header */
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10,flexWrap:"wrap",gap:6}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontWeight:600,fontSize:13,marginBottom:2}},p.nome||p.email),
+          React.createElement("div",{style:{fontSize:12,color:"var(--text2)"}},p.email)
+        ),
+        React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}},
+          badge(p.ativo,"Ativo"),
+          p.isAdmin&&badge(true,"Admin"),
+          p.email!==myEmail&&React.createElement("button",{className:"btn bd bs",style:{padding:"3px 8px"},onClick:()=>removeUser(idx)},"\u00D7")
+        )
+      ),
+      /* Ativo toggle */
+      React.createElement("label",{style:{display:"flex",alignItems:"center",gap:6,fontSize:12,cursor:"pointer",marginBottom:10}},
+        React.createElement("input",{type:"checkbox",checked:!!p.ativo,onChange:e=>updateUser(idx,"ativo",e.target.checked),style:chk}),"Acesso ativo"
+      ),
+      /* Abas */
+      React.createElement("div",{style:{marginBottom:10}},
+        React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"var(--text2)",marginBottom:6,textTransform:"uppercase",letterSpacing:".05em"}},"Abas vis\u00EDveis"),
+        React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:5}},
+          ALL_TABS_AC.map(([id,label])=>React.createElement("label",{key:id,style:{display:"flex",alignItems:"center",gap:4,fontSize:11,cursor:"pointer",padding:"3px 7px",border:".5px solid var(--border2)",borderRadius:20,background:p.tabs&&p.tabs.includes(id)?"var(--gbg)":"var(--bg2)",color:p.tabs&&p.tabs.includes(id)?"var(--green)":"var(--text2)"}},
+            React.createElement("input",{type:"checkbox",checked:!!(p.tabs&&p.tabs.includes(id)),onChange:()=>toggleTab(idx,id),style:chk}),label
+          ))
+        )
+      ),
+      /* Permissões */
+      React.createElement("div",{style:{display:"flex",gap:14,flexWrap:"wrap"}},
+        [["isAdmin","Administrador"],["canFinancials","Ver financeiro"],["canDelete","Excluir"],["canExport","Exportar"],["canEdit","Editar dados"]].map(([field,label])=>
+          React.createElement("label",{key:field,style:{display:"flex",alignItems:"center",gap:5,fontSize:12,cursor:"pointer"}},
+            React.createElement("input",{type:"checkbox",checked:!!p[field],onChange:e=>updateUser(idx,field,e.target.checked),style:chk}),label
+          )
+        )
+      )
+    ))
+  );
+}
+
+function ListManager({title,items,onAdd,onRemove}){
+  const[val,setVal]=React.useState("");
+  function add(){
+    const v=val.trim();
+    if(!v||items.includes(v))return;
+    onAdd(v);setVal("");
+  }
+  const inp={padding:"7px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",flex:1};
+  return React.createElement("div",{style:{marginBottom:12}},
+    React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"var(--text2)",textTransform:"uppercase",letterSpacing:".05em",marginBottom:6}},title),
+    React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8}},
+      items.filter(x=>x!=="Outro").map(function(item){
+        return React.createElement("div",{key:item,style:{display:"flex",alignItems:"center",gap:4,padding:"3px 8px 3px 10px",background:"var(--bg2)",borderRadius:20,border:".5px solid var(--border2)",fontSize:12}},
+          React.createElement("span",null,item),
+          React.createElement("button",{onClick:function(){onRemove(item);},style:{background:"none",border:"none",cursor:"pointer",color:"var(--text2)",fontSize:14,lineHeight:1,padding:"0 2px"}},"\u00D7")
+        );
+      })
+    ),
+    React.createElement("div",{style:{display:"flex",gap:6}},
+      React.createElement("input",{type:"text",placeholder:"Nova op\u00E7\u00E3o...",value:val,onChange:function(e){setVal(e.target.value);},onKeyDown:function(e){if(e.key==="Enter")add();},style:inp}),
+      React.createElement("button",{className:"btn bp bs",onClick:add},"+ Adicionar")
+    )
+  );
+}
+
+function Cfg({msgTpl,setMsgTpl,ac,setAc,isAdmin,permissions,setPermissions,myEmail,customLocais,setCustomLocais,customPerfs,setCustomPerfs,LOCAIS,PERFS}){
+  const[draft,setDraft]=useState(msgTpl);
+  const[acDraft,setAcDraft]=useState(()=>JSON.parse(JSON.stringify(ac)));
+  const[saved,setSaved]=useState(false);
+  const[acSaved,setAcSaved]=useState(false);
+  const[proc,setProc]=useState("Piercing");
+  const taRef=useRef(null);
+
+  function saveMsg(){setMsgTpl(draft);setSaved(true);setTimeout(()=>setSaved(false),2500);}
+  function resetMsg(){setDraft(MSG_DEFAULT);}
+
+  function saveAc(){setAc(acDraft);setAcSaved(true);setTimeout(()=>setAcSaved(false),2500);}
+  function resetAc(){setAcDraft(JSON.parse(JSON.stringify(AC_DEFAULT)));}
+
+  function insertVar(v){
+    const ta=taRef.current;if(!ta)return;
+    const start=ta.selectionStart,end=ta.selectionEnd;
+    const next=draft.slice(0,start)+v+draft.slice(end);
+    setDraft(next);
+    setTimeout(()=>{ta.focus();ta.setSelectionRange(start+v.length,start+v.length);},0);
+  }
+
+  const items=acDraft[proc]||[];
+  function setItems(fn){setAcDraft(d=>({...d,[proc]:typeof fn==="function"?fn(d[proc]||[]):fn}));}
+  function addItem(){setItems(arr=>[...arr,""]);}
+  function removeItem(i){setItems(arr=>arr.filter((_,x)=>x!==i));}
+  function editItem(i,val){setItems(arr=>arr.map((x,xi)=>xi===i?val:x));}
+  function moveUp(i){if(i===0)return;setItems(arr=>{const a=[...arr];[a[i-1],a[i]]=[a[i],a[i-1]];return a;});}
+  function moveDown(i){setItems(arr=>{if(i>=arr.length-1)return arr;const a=[...arr];[a[i],a[i+1]]=[a[i+1],a[i]];return a;});}
+
+  const preview=buildPreview(draft,acDraft);
+
+  return React.createElement("div",null,
+
+    /* ── Cuidados por procedimento ── */
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{className:"stl"},"Cuidados pós-procedimento"),
+      React.createElement("p",{style:{fontSize:13,color:"var(--text2)",marginBottom:14}},"Edite os cuidados que aparecem na variável "+React.createElement("code",{style:{color:"var(--blue)"}}," {cuidados}")+" da mensagem e no PDF. Todos os itens são enviados."),
+
+      /* proc tabs */
+      React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}},
+        PROCS.map(p=>React.createElement("button",{key:p,className:"btn bs"+(proc===p?" bp":""),onClick:()=>setProc(p)},p))
+      ),
+
+      /* items list */
+      items.map((item,i)=>React.createElement("div",{key:i,style:{display:"grid",gridTemplateColumns:"auto 1fr auto",gap:6,marginBottom:8,alignItems:"center"}},
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:2}},
+          React.createElement("button",{className:"btn bs",style:{padding:"2px 6px",fontSize:11},onClick:()=>moveUp(i),disabled:i===0},"\u25B2"),
+          React.createElement("button",{className:"btn bs",style:{padding:"2px 6px",fontSize:11},onClick:()=>moveDown(i),disabled:i===items.length-1},"\u25BC")
+        ),
+        React.createElement("input",{type:"text",value:item,onChange:e=>editItem(i,e.target.value),placeholder:"Digite o cuidado...",style:{padding:"8px 10px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",width:"100%"}}),
+        React.createElement("button",{className:"btn bd bs",style:{padding:"6px 10px"},onClick:()=>removeItem(i)},"\u00D7")
+      )),
+      React.createElement("div",{style:{display:"flex",gap:8,marginTop:4,alignItems:"center",flexWrap:"wrap"}},
+        React.createElement("button",{className:"btn bs",onClick:addItem},"+ Adicionar cuidado"),
+        React.createElement("button",{className:"btn bp",onClick:saveAc},"Salvar cuidados"),
+        React.createElement("button",{className:"btn bs",onClick:resetAc},"Restaurar padrão"),
+        acSaved&&React.createElement("span",{className:"alert-ok"},"✓ Salvo!")
+      )
+    ),
+
+    /* ── Banco de Dados ── */
+    React.createElement(BancoDados,null),
+
+    /* ── Controle de Acessos ── */
+    isAdmin&&React.createElement(AccessControl,{permissions:permissions,setPermissions:setPermissions,myEmail:myEmail}),
+    /* ── Locais e Perfurações ── */
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{className:"stl"},"Locais e Perfurações"),
+      React.createElement("p",{style:{fontSize:13,color:"var(--text2)",marginBottom:14,lineHeight:1.5}},"Personalize as opções disponíveis no Novo Atendimento. As opções padrão não podem ser removidas — apenas as que você adicionar."),
+      React.createElement(ListManager,{
+        title:"Locais",
+        items:LOCAIS,
+        onAdd:function(v){setCustomLocais([...customLocais,v]);},
+        onRemove:function(v){setCustomLocais(customLocais.filter(x=>x!==v));}
+      }),
+      React.createElement(ListManager,{
+        title:"Perfurações",
+        items:PERFS,
+        onAdd:function(v){setCustomPerfs([...customPerfs,v]);},
+        onRemove:function(v){setCustomPerfs(customPerfs.filter(x=>x!==v));}
+      })
+    ),
+
+    /* ── Senha de acesso ── */
+    React.createElement("div",{className:"card"},
+      React.createElement(SenhaConfig,null)
+    ),
+
+    /* ── Mensagem WhatsApp ── */
+    React.createElement("div",{className:"card"},
+      React.createElement("div",{className:"stl"},"Mensagem do WhatsApp"),
+      React.createElement("p",{style:{fontSize:13,color:"var(--text2)",marginBottom:14}},"Personalize a mensagem enviada após o pagamento. Use as variáveis abaixo clicando nelas."),
+
+      React.createElement("div",{style:{marginBottom:12}},
+        React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"var(--text2)",marginBottom:8}},"VARIÁVEIS — clique para inserir no cursor:"),
+        React.createElement("div",{className:"var-chips"},
+          VARS.map(({v,desc})=>React.createElement("button",{key:v,className:"chip",title:desc,onClick:()=>insertVar(v)},v))
+        )
+      ),
+
+      React.createElement("div",{className:"cfg-grid"},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"var(--text2)",marginBottom:6}},"✏️ EDITOR"),
+          React.createElement("textarea",{ref:taRef,value:draft,onChange:e=>setDraft(e.target.value),rows:16,style:{width:"100%",padding:"10px 12px",border:".5px solid var(--border2)",borderRadius:"var(--radius)",fontSize:13,background:"var(--bg)",color:"var(--text)",resize:"vertical",lineHeight:1.7,fontFamily:"monospace"}}),
+          React.createElement("div",{style:{display:"flex",gap:8,marginTop:10,alignItems:"center",flexWrap:"wrap"}},
+            React.createElement("button",{className:"btn bp",onClick:saveMsg},"Salvar mensagem"),
+            React.createElement("button",{className:"btn bs",onClick:resetMsg},"Restaurar padrão"),
+            saved&&React.createElement("span",{className:"alert-ok"},"✓ Salvo!")
+          )
+        ),
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"var(--text2)",marginBottom:6}},"👁 PRÉVIA (Piercing como exemplo):"),
+          React.createElement("div",{style:{background:"#DCF8C6",borderRadius:"var(--rlg)",padding:"10px 12px 6px",marginBottom:6}},
+            React.createElement("div",{style:{fontSize:11,color:"#3C763D",fontWeight:600,marginBottom:8}},"WhatsApp • Enviado agora"),
+            React.createElement("div",{className:"wa-sim"},preview)
+          ),
+          React.createElement("div",{style:{fontSize:11,color:"var(--text2)",marginTop:8,lineHeight:1.6}},
+            React.createElement("strong",null,"Variáveis disponíveis:"),React.createElement("br",null),
+            VARS.map(({v,desc})=>React.createElement("span",{key:v,style:{display:"block"}},React.createElement("code",{style:{color:"var(--blue)",fontSize:11}},v)," → "+desc))
+          )
+        )
+      )
+    )
+  );
+}
+
+function Root(){
+  const[user,setUser]=React.useState(window._user||null);
+  const[ready,setReady]=React.useState(false);
+  React.useEffect(()=>{
+    const unsub=window._auth.onAuthStateChanged(u=>{window._user=u;setUser(u);setReady(true);});
+    return unsub;
+  },[]);
+  if(!ready) return React.createElement("div",{style:{padding:"60px 20px",textAlign:"center",color:"var(--text2)",fontSize:14}},"Carregando...");
+  if(!user) return React.createElement(Login,null);
+  return React.createElement("div",null,
+    React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",alignItems:"center",gap:10,padding:"8px 16px 0",fontSize:12,color:"var(--text2)"}},
+      React.createElement("span",null,"\u{1F464} ",user.email),
+      React.createElement("button",{className:"btn bs",onClick:()=>{if(confirm("Sair do sistema?"))window._auth.signOut();}},"Sair")
+    ),
+    React.createElement(App,null)
+  );
+}
+ReactDOM.render(React.createElement(Root),document.getElementById("app"));
+</script>
+</body>
+</html>
